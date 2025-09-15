@@ -23,12 +23,14 @@ class VideoProcessor:
         processed_dir: str = "data/processed",
         splice_duration: int = 120,
         buffer_duration: int = 10,
+        target_fps: Optional[float] = None,
     ):
 
         self.raw_video_dir = Path(raw_video_dir)
         self.processed_dir = Path(processed_dir)
         self.splice_duration = splice_duration
         self.buffer_duration = buffer_duration
+        self.target_fps = target_fps
         self.total_segment_duration = splice_duration + (2 * buffer_duration)
 
         self.processed_dir.mkdir(parents=True, exist_ok=True)
@@ -39,20 +41,54 @@ class VideoProcessor:
         logger.info(
             f"  Splice duration: {splice_duration}s with {buffer_duration}s buffers"
         )
+        if target_fps:
+            logger.info(f"  Target FPS: {target_fps}")
+        else:
+            logger.info("  Target FPS: Keep original")
+
+    def get_video_info(self, video_path: Path) -> Tuple[float, float]:
+        """
+        Gets duration and FPS of video
+        """
+        try:
+            probe = ffmpeg.probe(str(video_path))
+            video_info = next(s for s in probe["streams"] if s["codec_type"] == "video")
+            duration = float(probe["format"]["duration"])
+
+            fps = None
+            if "r_frame_rate" in video_info:
+                fps_str = video_info["r_frame_rate"]
+                if "/" in fps_str:
+                    num, den = fps_str.split("/")
+                    fps = float(num) / float(den) if float(den) != 0 else None
+                else:
+                    fps = float(fps_str)
+
+            # fallback to avg_frame_rate if r_frame_rate not available
+            if fps is None or fps == 0:
+                if "avg_frame_rate" in video_info:
+                    fps_str = video_info["avg_frame_rate"]
+                    if "/" in fps_str:
+                        num, den = fps_str.split("/")
+                        fps = float(num) / float(den) if float(den) != 0 else 30.0
+                    else:
+                        fps = float(fps_str)
+                else:
+                    fps = 30.0
+
+            logger.info(f"vid info - duration: {duration:.2f}s, fps: {fps:.2f}")
+            return duration, fps
+
+        except Exception as e:
+            logger.error(f"can't get video info for {video_path}: {e}")
+            return 0.0, 30.0
 
     def get_video_duration(self, video_path: Path) -> float:
         """
         Gets duration of vid in seconds
         """
-
-        try:
-            probe = ffmpeg.probe(str(video_path))
-            video_info = next(s for s in probe["streams"] if s["codec_type"] == "video")
-            duration = float(probe["format"]["duration"])
-            return duration
-        except Exception as e:
-            logger.error(f"can't get duration for {video_path}: {e}")
-            return 0.0
+        duration, _ = self.get_video_info(video_path)
+        return duration
 
     def get_lecture_folders(self) -> List[Path]:
 
@@ -98,9 +134,19 @@ class VideoProcessor:
                 concat_file = f.name
 
             logger.info(f"concatting {len(video_files)} vids")
+
+            # Build ffmpeg command for concatenation
+            input_stream = ffmpeg.input(concat_file, format="concat", safe=0)
+            output_args = {"c": "copy"}
+
+            if self.target_fps:
+                output_args["r"] = self.target_fps
+                output_args["c:v"] = "libx264"
+                output_args["c:a"] = "copy"
+                logger.info(f"Setting FPS to {self.target_fps} during concatenation")
+
             (
-                ffmpeg.input(concat_file, format="concat", safe=0)
-                .output(str(output_path), c="copy")
+                input_stream.output(str(output_path), **output_args)
                 .overwrite_output()
                 .run(capture_stdout=True, capture_stderr=True)
             )
@@ -124,20 +170,20 @@ class VideoProcessor:
     def splice_video(
         self, video_path: Path, output_folder: Path, lecture_date: str
     ) -> List[Path]:
-        """
-        Splices video into segments with buffer
-        """
 
         output_folder.mkdir(parents=True, exist_ok=True)
         spliced_files = []
 
         try:
-            duration = self.get_video_duration(video_path)
+            duration, original_fps = self.get_video_info(video_path)
             if duration == 0:
                 logger.error(f"cant determine video duration for {video_path}")
                 return []
 
-            logger.info(f"vid duration: {duration:.2f} secs")
+            effective_fps = self.target_fps if self.target_fps else original_fps
+            logger.info(
+                f"vid duration: {duration:.2f} secs, using FPS: {effective_fps:.2f}"
+            )
 
             num_splices = int(duration / self.splice_duration) + (
                 1 if duration % self.splice_duration > 0 else 0
@@ -166,18 +212,28 @@ class VideoProcessor:
 
                 logger.info(
                     f"cooking splice {i+1}/{num_splices}: {output_filename} "
-                    f"[{buffered_start:.1f}s - {end_time:.1f}s]"
+                    f"[{buffered_start:.1f}s - {end_time:.1f}s] @ {effective_fps:.1f}fps"
                 )
 
                 try:
+                    input_stream = ffmpeg.input(str(video_path), ss=buffered_start)
+
+                    output_args = {
+                        "t": segment_duration,
+                        "avoid_negative_ts": "make_zero",
+                    }
+
+                    if self.target_fps:
+                        output_args["r"] = self.target_fps
+                        output_args["c:v"] = "libx264"
+                        output_args["c:a"] = "copy"
+                        output_args["preset"] = "medium"
+                        output_args["crf"] = "23"
+                    else:
+                        output_args["c"] = "copy"
+
                     (
-                        ffmpeg.input(str(video_path), ss=buffered_start)
-                        .output(
-                            str(output_path),
-                            t=segment_duration,
-                            c="copy",
-                            avoid_negative_ts="make_zero",
-                        )
+                        input_stream.output(str(output_path), **output_args)
                         .overwrite_output()
                         .run(capture_stdout=True, capture_stderr=True)
                     )
@@ -216,7 +272,6 @@ class VideoProcessor:
             spliced_files = self.splice_video(mts_files[0], output_folder, lecture_date)
             return len(spliced_files) > 0
 
-        # multiple vids: concatenate then splice
         logger.info(f"multiple vid files ({len(mts_files)}), concat first")
 
         with tempfile.NamedTemporaryFile(suffix=".mp4", delete=False) as temp_concat:
@@ -306,6 +361,8 @@ class VideoProcessor:
         logger.info(f"SUMMARY:")
         logger.info(f"  - total lectures processed: {len(lecture_folders)}")
         logger.info(f"  - total splices made: {total_splices}")
+        if self.target_fps:
+            logger.info(f"  - target FPS: {self.target_fps}")
         logger.info(f"{'='*60}")
 
 
@@ -315,6 +372,7 @@ def main():
         processed_dir="data/processed",
         splice_duration=120,
         buffer_duration=10,
+        target_fps=10.0,
     )
 
     logger.info("\n" + "=" * 60)
