@@ -27,24 +27,69 @@ TIME_SCALE = 0.1
 TARGET_FPS = 10
 VIDEO_DURATION = 7.0
 
+# Updated COPUS actions based on the new list
 COPUS_ACTIONS = {
-    'student_question': 0,
-    'student_answer': 1,
-    'student_discussion': 2,
-    'student_presentation': 3,
-    'student_writing': 4,
-    'student_listening': 5,
-    'student_other': 6,
-    'instructor_lecturing': 7,
-    'instructor_writing': 8,
-    'instructor_demonstrating': 9,
-    'instructor_question': 10,
-    'instructor_answer': 11,
-    'instructor_moving': 12,
-    'instructor_other': 13,
+    # Student actions
+    'student_listening': 0,  # L - Listening to instructor/taking notes
+    'student_individual_thinking': 1,  # Ind - Individual thinking/problem solving
+    'student_clicker_group': 2,  # CG - Discuss clicker question in groups
+    'student_worksheet_group': 3,  # WG - Working in groups on worksheet
+    'student_other_group': 4,  # OG - Other assigned group activity
+    'student_answer_question': 5,  # AnQ - Answering instructor question
+    'student_ask_question': 6,  # SQ - Student asks question
+    'student_whole_class_discussion': 7,  # WC - Whole class discussion
+    'student_prediction': 8,  # Prd - Making prediction
+    'student_presentation': 9,  # SP - Presentation by student(s)
+    'student_test_quiz': 10,  # TQ - Test or quiz
+    'student_waiting': 11,  # W - Waiting
+    'student_other': 12,  # O - Other
+    
+    # Instructor actions
+    'instructor_lecturing': 13,  # Lec - Lecturing
+    'instructor_real_time_writing': 14,  # RtW - Real-time writing
+    'instructor_follow_up': 15,  # FUp - Follow-up/feedback on clicker
+    'instructor_posing_question': 16,  # PQ - Posing non-clicker question
+    'instructor_clicker_question': 17,  # CQ - Asking clicker question
+    'instructor_answering_question': 18,  # AnQ - Answering student questions
+    'instructor_moving_guiding': 19,  # MG - Moving through class guiding
+    'instructor_one_on_one': 20,  # 1o1 - One-on-one discussion
+    'instructor_demo_video': 21,  # D/V - Demo, experiment, video
+    'instructor_administration': 22,  # Adm - Administration
+    'instructor_waiting': 23,  # W - Waiting
 }
 
 ACTIONS_REVERSE = {v: k for k, v in COPUS_ACTIONS.items()}
+
+# Human-readable labels with COPUS codes
+COPUS_LABELS = {
+    # Student actions
+    'student_listening': 'L - Listening/Taking Notes',
+    'student_individual_thinking': 'Ind - Individual Thinking',
+    'student_clicker_group': 'CG - Clicker Group Discussion',
+    'student_worksheet_group': 'WG - Worksheet Group Work',
+    'student_other_group': 'OG - Other Group Activity',
+    'student_answer_question': 'AnQ - Answering Question',
+    'student_ask_question': 'SQ - Asking Question',
+    'student_whole_class_discussion': 'WC - Whole Class Discussion',
+    'student_prediction': 'Prd - Making Prediction',
+    'student_presentation': 'SP - Student Presentation',
+    'student_test_quiz': 'TQ - Test/Quiz',
+    'student_waiting': 'W - Waiting',
+    'student_other': 'O - Other',
+    
+    # Instructor actions
+    'instructor_lecturing': 'Lec - Lecturing',
+    'instructor_real_time_writing': 'RtW - Real-time Writing',
+    'instructor_follow_up': 'FUp - Follow-up/Feedback',
+    'instructor_posing_question': 'PQ - Posing Question',
+    'instructor_clicker_question': 'CQ - Clicker Question',
+    'instructor_answering_question': 'AnQ - Answering Questions',
+    'instructor_moving_guiding': 'MG - Moving/Guiding',
+    'instructor_one_on_one': '1o1 - One-on-One',
+    'instructor_demo_video': 'D/V - Demo/Video',
+    'instructor_administration': 'Adm - Administration',
+    'instructor_waiting': 'W - Waiting',
+}
 
 
 def map_to_nearest_scale(values, scale):
@@ -260,7 +305,8 @@ class COPUSEvaluator:
                         predictions.append({
                             'action': action_name,
                             'confidence': prob.item(),
-                            'readable': action_name.replace('_', ' ').title()
+                            'readable': COPUS_LABELS.get(action_name, action_name),
+                            'code': action_name
                         })
                     
                     results['predictions'] = predictions
@@ -301,19 +347,112 @@ class COPUSEvaluator:
 
         description_lower = description.lower()
         
+        # Updated keyword mappings for new COPUS categories
         action_keywords = {
-            'student_question': ['student asking', 'raising hand', 'student question', 'asks the'],
-            'student_answer': ['student answering', 'student responds', 'student reply'],
-            'student_discussion': ['students discussing', 'group discussion', 'peer discussion'],
-            'student_presentation': ['student presenting', 'student at board', 'student demonstration'],
-            'student_writing': ['students writing', 'taking notes', 'student writes'],
-            'student_listening': ['students listening', 'students watching', 'paying attention'],
-            'instructor_lecturing': ['instructor speaking', 'teacher explaining', 'professor talking', 'lecturing'],
-            'instructor_writing': ['instructor writing', 'teacher at board', 'writing on board'],
-            'instructor_demonstrating': ['instructor demonstrating', 'showing how', 'demonstration'],
-            'instructor_question': ['instructor asking', 'teacher questions', 'asks students'],
-            'instructor_answer': ['instructor answering', 'responding to student'],
-            'instructor_moving': ['instructor walking', 'teacher moving', 'walking around'],
+            # Student actions
+            'student_listening': [
+                'students listening', 'taking notes', 'students watching instructor',
+                'paying attention', 'students focused on', 'listening to lecture',
+                'watching the board', 'students observing'
+            ],
+            'student_individual_thinking': [
+                'thinking individually', 'working alone', 'solving problems individually',
+                'individual work', 'thinking on their own', 'working independently',
+                'students thinking', 'reflecting individually'
+            ],
+            'student_clicker_group': [
+                'clicker discussion', 'discussing clicker', 'clicker groups',
+                'talking about clicker', 'clicker question discussion'
+            ],
+            'student_worksheet_group': [
+                'worksheet groups', 'working on worksheet', 'group worksheet',
+                'worksheet activity', 'completing worksheet together'
+            ],
+            'student_other_group': [
+                'group discussion', 'students discussing', 'group work',
+                'working in groups', 'collaborative work', 'peer discussion',
+                'students talking', 'group activity'
+            ],
+            'student_answer_question': [
+                'student answering', 'student responds', 'student reply',
+                'answering question', 'student explains', 'student response'
+            ],
+            'student_ask_question': [
+                'student asking', 'raising hand', 'student question',
+                'asks the instructor', 'student inquires', 'asks about'
+            ],
+            'student_whole_class_discussion': [
+                'class discussion', 'whole class', 'class debate',
+                'everyone discussing', 'class conversation', 'sharing with class'
+            ],
+            'student_prediction': [
+                'making prediction', 'predicting outcome', 'students predict',
+                'guessing result', 'hypothesis', 'students anticipate'
+            ],
+            'student_presentation': [
+                'student presenting', 'student at board', 'student demonstration',
+                'presenting to class', 'student explains to class', 'student shows'
+            ],
+            'student_test_quiz': [
+                'taking test', 'quiz', 'exam', 'assessment', 'students testing',
+                'completing quiz', 'test in progress'
+            ],
+            'student_waiting': [
+                'students waiting', 'idle', 'not engaged', 'waiting for',
+                'students inactive', 'no activity'
+            ],
+            
+            # Instructor actions
+            'instructor_lecturing': [
+                'instructor speaking', 'teacher explaining', 'professor talking',
+                'lecturing', 'presenting content', 'instructor teaches',
+                'delivering lecture', 'explaining concepts'
+            ],
+            'instructor_real_time_writing': [
+                'writing on board', 'instructor writing', 'drawing on board',
+                'writing equations', 'board work', 'whiteboard writing',
+                'projector writing', 'annotating'
+            ],
+            'instructor_follow_up': [
+                'feedback on question', 'reviewing answers', 'discussing results',
+                'follow-up', 'explaining answers', 'clarifying responses',
+                'reviewing clicker', 'going over answers'
+            ],
+            'instructor_posing_question': [
+                'asking question', 'instructor asks', 'posing question',
+                'questioning students', 'teacher questions', 'prompting students'
+            ],
+            'instructor_clicker_question': [
+                'clicker question', 'using clicker', 'polling students',
+                'clicker poll', 'electronic response', 'clicker activity'
+            ],
+            'instructor_answering_question': [
+                'answering student', 'responding to question', 'instructor responds',
+                'addressing question', 'teacher answers', 'replying to student'
+            ],
+            'instructor_moving_guiding': [
+                'walking around', 'moving through class', 'circulating',
+                'checking on groups', 'monitoring students', 'guiding groups',
+                'instructor moving', 'walking between'
+            ],
+            'instructor_one_on_one': [
+                'individual help', 'one-on-one', 'helping individual',
+                'personal assistance', 'individual discussion', 'private conversation'
+            ],
+            'instructor_demo_video': [
+                'demonstration', 'showing video', 'experiment', 'demo',
+                'simulation', 'showing animation', 'displaying video',
+                'conducting experiment', 'visual demonstration'
+            ],
+            'instructor_administration': [
+                'taking attendance', 'handing out', 'collecting papers',
+                'administrative', 'homework assignment', 'returning tests',
+                'class logistics', 'announcements'
+            ],
+            'instructor_waiting': [
+                'instructor waiting', 'teacher idle', 'not teaching',
+                'instructor paused', 'waiting for students'
+            ],
         }
         
         scores = {}
@@ -327,7 +466,8 @@ class COPUSEvaluator:
             return [{
                 'action': 'instructor_lecturing',
                 'confidence': 0.1,
-                'readable': 'Instructor Lecturing'
+                'readable': COPUS_LABELS['instructor_lecturing'],
+                'code': 'instructor_lecturing'
             }]
         
         total_score = sum(scores.values())
@@ -336,7 +476,8 @@ class COPUSEvaluator:
             predictions.append({
                 'action': action,
                 'confidence': score / total_score,
-                'readable': action.replace('_', ' ').title()
+                'readable': COPUS_LABELS.get(action, action),
+                'code': action
             })
         
         return predictions[:3]  # Return top 3
@@ -410,7 +551,7 @@ class COPUSEvaluator:
             if action_counts:
                 logger.info("\nDetected Actions:")
                 for action, count in sorted(action_counts.items(), key=lambda x: x[1], reverse=True):
-                    readable = action.replace('_', ' ').title()
+                    readable = COPUS_LABELS.get(action, action)
                     percentage = (count / successful) * 100
                     logger.info(f"  - {readable}: {count} ({percentage:.1f}%)")
         
@@ -428,8 +569,8 @@ class COPUSEvaluator:
             result['correct'] = correct
             
             logger.info(f"\n--- Comparison with Ground Truth ---")
-            logger.info(f"Ground Truth: {true_label.replace('_', ' ').title()}")
-            logger.info(f"Prediction: {predicted_action.replace('_', ' ').title()}")
+            logger.info(f"Ground Truth: {COPUS_LABELS.get(true_label, true_label)}")
+            logger.info(f"Prediction: {COPUS_LABELS.get(predicted_action, predicted_action)}")
             logger.info(f"Result: {'✓ Correct' if correct else '✗ Incorrect'}")
         
         return result
