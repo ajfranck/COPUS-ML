@@ -6,12 +6,7 @@ import logging
 from datetime import timedelta
 import shutil
 import tempfile
-
-try:
-    import ffmpeg
-except ImportError:
-    print("ffmpeg-python not installed")
-    sys.exit(1)
+import ffmpeg
 
 
 logging.basicConfig(
@@ -348,7 +343,7 @@ class VideoProcessor:
 
         if not lecture_folders:
             logger.warning("No lecture folders")
-            logger.into("1. create folders w/ 8-digit names (YYYYMMDD format)")
+            logger.info("1. create folders w/ 8-digit names (YYYYMMDD format)")
             logger.info("2. put mts vds in  those folders")
             return 0, 0
 
@@ -444,10 +439,12 @@ def main():
         sys.exit(1)
     
     processor = VideoProcessor(
-        raw_video_dir="data/raw/videos",
+        raw_video_dir="data/raw/videos/lecture_segment",
         processed_dir="data/processed",
-        splice_duration=120,
-        buffer_duration=10,
+        # splice_duration=120,
+        # buffer_duration=10,
+        splice_duration=3,
+        buffer_duration=0,
         target_fps=10.0,
     )
 

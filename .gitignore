@@ -31,6 +31,9 @@ MANIFEST
 *.xls
 *.MTS
 *.mp4
+-
+#ignore json files
+*.json
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
