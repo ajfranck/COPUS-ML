@@ -439,8 +439,8 @@ def main():
         sys.exit(1)
     
     processor = VideoProcessor(
-        raw_video_dir="data/raw/videos/lecture_segment",
-        processed_dir="data/processed/lecturing/",
+        raw_video_dir="data/raw/videos/lecture_training",
+        processed_dir="data/processed/training/lecturing/",
         # splice_duration=120,
         # buffer_duration=10,
         splice_duration=10,
