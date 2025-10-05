@@ -440,10 +440,10 @@ def main():
     
     processor = VideoProcessor(
         raw_video_dir="data/raw/videos/lecture_training",
-        processed_dir="data/processed/training/lecturing/",
+        processed_dir="data/processed/training/lecture_full/",
         # splice_duration=120,
         # buffer_duration=10,
-        splice_duration=10,
+        splice_duration=3700,
         buffer_duration=0,
         target_fps=3.0,
     )

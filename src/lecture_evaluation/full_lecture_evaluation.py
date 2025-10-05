@@ -671,7 +671,7 @@ if __name__ == "__main__":
         # logger.info("  python full_lecture_evaluation.py video.MTS --output output.json --no-convert-mts")
 
         test_videos = [
-            Path("data/raw/videos/20191101/00003.mp4"),
+            Path("data/processed/training/lecture_full/20191101/full_lecture_1101.mp4"),
         ]
 
         for test_video in test_videos:
