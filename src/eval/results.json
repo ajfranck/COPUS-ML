@@ -1,0 +1,670 @@
+[
+  {
+    "description": "In the classroom, a teacher is standing near two green boards. He moves his hands and body while talking to students about class information written on one of the blackboards. The student in front listens carefully with their back facing us. Another female student looks down at her laptop screen as she takes notes.",
+    "has_classifier": false,
+    "predictions": [
+      {
+        "action": "instructor_lecturing",
+        "confidence": 0.1,
+        "readable": "Instructor Lecturing"
+      }
+    ],
+    "video_path": "D:\\_GITHUB\\COPUS-ML\\data\\processed\\20191101\\20191101_001.mp4",
+    "timestamp": "2025-09-17T21:40:31.575623",
+    "model_type": "base"
+  },
+  {
+    "description": "In a classroom, the teacher is explaining to students about exam notes written on the board. The female student in green clothes and another male student are listening attentively while sitting at their desks with notebooks open before them.",
+    "has_classifier": false,
+    "predictions": [
+      {
+        "action": "instructor_lecturing",
+        "confidence": 0.1,
+        "readable": "Instructor Lecturing"
+      }
+    ],
+    "video_path": "D:\\_GITHUB\\COPUS-ML\\data\\processed\\20191101\\20191101_002.mp4",
+    "timestamp": "2025-09-17T21:41:39.641751",
+    "model_type": "base"
+  },
+  {
+    "description": "In a classroom, an instructor is standing at the front of class explaining material written on a chalkboard. The students are sitting and listening attentively to what he has to say about it.",
+    "has_classifier": false,
+    "predictions": [
+      {
+        "action": "instructor_lecturing",
+        "confidence": 0.1,
+        "readable": "Instructor Lecturing"
+      }
+    ],
+    "video_path": "D:\\_GITHUB\\COPUS-ML\\data\\processed\\20191101\\20191101_003.mp4",
+    "timestamp": "2025-09-17T21:42:45.190908",
+    "model_type": "base"
+  },
+  {
+    "description": "In the classroom, a teacher is writing on the board. The students are sitting at their desks and listening attentively to him speak about his lesson plan topics written out in English text with an eraser in hand.",
+    "has_classifier": false,
+    "predictions": [
+      {
+        "action": "instructor_lecturing",
+        "confidence": 0.1,
+        "readable": "Instructor Lecturing"
+      }
+    ],
+    "video_path": "D:\\_GITHUB\\COPUS-ML\\data\\processed\\20191101\\20191101_004.mp4",
+    "timestamp": "2025-09-17T21:43:53.254426",
+    "model_type": "base"
+  },
+  {
+    "description": "A classroom is being taught. A man in green clothes stands at the blackboard, writing with chalk and explaining to his students who are sitting on chairs around him listening carefully while reading their notes or books.",
+    "has_classifier": false,
+    "predictions": [
+      {
+        "action": "instructor_lecturing",
+        "confidence": 0.1,
+        "readable": "Instructor Lecturing"
+      }
+    ],
+    "video_path": "D:\\_GITHUB\\COPUS-ML\\data\\processed\\20191101\\20191101_005.mp4",
+    "timestamp": "2025-09-17T21:45:08.198607",
+    "model_type": "base"
+  },
+  {
+    "description": "A man is standing in front of a blackboard teaching students who are sitting and listening to him.",
+    "has_classifier": false,
+    "predictions": [
+      {
+        "action": "instructor_lecturing",
+        "confidence": 0.1,
+        "readable": "Instructor Lecturing"
+      }
+    ],
+    "video_path": "D:\\_GITHUB\\COPUS-ML\\data\\processed\\20191101\\20191101_006.mp4",
+    "timestamp": "2025-09-17T21:46:21.604490",
+    "model_type": "base"
+  },
+  {
+    "description": "In a classroom, an old man is teaching students. He writes on the blackboard with chalk and speaks to them.",
+    "has_classifier": false,
+    "predictions": [
+      {
+        "action": "instructor_lecturing",
+        "confidence": 0.1,
+        "readable": "Instructor Lecturing"
+      }
+    ],
+    "video_path": "D:\\_GITHUB\\COPUS-ML\\data\\processed\\20191101\\20191101_007.mp4",
+    "timestamp": "2025-09-17T21:47:18.696177",
+    "model_type": "base"
+  },
+  {
+    "description": "In a classroom, there is an elderly man standing on the right side of the frame writing with chalk on a greenboard. He writes and speaks in Chinese while gesturing towards his left hand to emphasize points as he talks. Two students are seated at tables facing him; one wears glasses and looks down at something near her hands, possibly taking notes or using electronic devices, occasionally looking up briefly before returning to focus below. The other student has short hair and also appears engaged but mostly focused downward.\n\nThe scene takes place inside a room where sunlight streams through large windows that reflect light onto white walls. On the far wall behind them hangs another empty blackboard, which stands out against its surroundings due to its color contrasted by predominantly whitish hues from paper-covered surfaces nearby.",
+    "has_classifier": false,
+    "predictions": [
+      {
+        "action": "student_writing",
+        "confidence": 1.0,
+        "readable": "Student Writing"
+      }
+    ],
+    "video_path": "D:\\_GITHUB\\COPUS-ML\\data\\processed\\20191101\\20191101_008.mp4",
+    "timestamp": "2025-09-17T21:49:17.518278",
+    "model_type": "base"
+  },
+  {
+    "description": "In a classroom, an old man is teaching students something. He stands at the front of class and writes on the blackboard with chalk while talking to his audience in front of him. The kids are seated around tables facing toward where he teaches them, paying attention as they watch what this instructor does for their education lesson plan today.",
+    "has_classifier": false,
+    "predictions": [
+      {
+        "action": "student_listening",
+        "confidence": 1.0,
+        "readable": "Student Listening"
+      }
+    ],
+    "video_path": "D:\\_GITHUB\\COPUS-ML\\data\\processed\\20191101\\20191101_009.mp4",
+    "timestamp": "2025-09-17T21:50:34.357549",
+    "model_type": "base"
+  },
+  {
+    "description": "In the classroom, a man is teaching students. He writes on the board while some of them listen attentively and others look at their books.",
+    "has_classifier": false,
+    "predictions": [
+      {
+        "action": "instructor_lecturing",
+        "confidence": 0.1,
+        "readable": "Instructor Lecturing"
+      }
+    ],
+    "video_path": "D:\\_GITHUB\\COPUS-ML\\data\\processed\\20191101\\20191101_010.mp4",
+    "timestamp": "2025-09-17T21:51:33.787318",
+    "model_type": "base"
+  },
+  {
+    "description": "A teacher is writing on a blackboard. Students are sitting at desks and paying attention to the lesson while taking notes in their notebooks, looking up words or phrases they do not understand from dictionaries with laptops open nearby.",
+    "has_classifier": false,
+    "predictions": [
+      {
+        "action": "student_writing",
+        "confidence": 0.5,
+        "readable": "Student Writing"
+      },
+      {
+        "action": "student_listening",
+        "confidence": 0.5,
+        "readable": "Student Listening"
+      }
+    ],
+    "video_path": "D:\\_GITHUB\\COPUS-ML\\data\\processed\\20191101\\20191101_011.mp4",
+    "timestamp": "2025-09-17T21:52:39.807328",
+    "model_type": "base"
+  },
+  {
+    "description": "A teacher is explaining something to his students in front of a blackboard. The students are listening attentively and taking notes on their papers, trying to understand the lesson being taught by the instructor.",
+    "has_classifier": false,
+    "predictions": [
+      {
+        "action": "student_writing",
+        "confidence": 1.0,
+        "readable": "Student Writing"
+      }
+    ],
+    "video_path": "D:\\_GITHUB\\COPUS-ML\\data\\processed\\20191101\\20191101_012.mp4",
+    "timestamp": "2025-09-17T21:53:44.003489",
+    "model_type": "base"
+  },
+  {
+    "description": "In a classroom, an old man in green is teaching students by writing on the blackboard with chalk. The three children are sitting and watching attentively as he teaches them.",
+    "has_classifier": false,
+    "predictions": [
+      {
+        "action": "instructor_lecturing",
+        "confidence": 0.1,
+        "readable": "Instructor Lecturing"
+      }
+    ],
+    "video_path": "D:\\_GITHUB\\COPUS-ML\\data\\processed\\20191101\\20191101_013.mp4",
+    "timestamp": "2025-09-17T21:54:46.228479",
+    "model_type": "base"
+  },
+  {
+    "description": "In a classroom, the teacher is teaching students by explaining on the blackboard. Students are sitting at their desks and listening attentively to what he says.",
+    "has_classifier": false,
+    "predictions": [
+      {
+        "action": "instructor_lecturing",
+        "confidence": 0.1,
+        "readable": "Instructor Lecturing"
+      }
+    ],
+    "video_path": "D:\\_GITHUB\\COPUS-ML\\data\\processed\\20191101\\20191101_014.mp4",
+    "timestamp": "2025-09-17T21:55:46.505862",
+    "model_type": "base"
+  },
+  {
+    "description": "In the classroom, a teacher is writing on the blackboard while explaining to students. Students are listening attentively and taking notes in their notebooks.",
+    "has_classifier": false,
+    "predictions": [
+      {
+        "action": "student_writing",
+        "confidence": 1.0,
+        "readable": "Student Writing"
+      }
+    ],
+    "video_path": "D:\\_GITHUB\\COPUS-ML\\data\\processed\\20191101\\20191101_015.mp4",
+    "timestamp": "2025-09-17T21:56:45.845906",
+    "model_type": "base"
+  },
+  {
+    "description": "In the classroom, an old man is teaching while standing at a blackboard. He writes something on the board with chalk and points to it as he speaks. Two students are sitting in front of him; one has her head down looking intently ahead, wearing green clothes, while the other is writing notes with his eyes fixed on what's being taught.",
+    "has_classifier": false,
+    "predictions": [
+      {
+        "action": "instructor_lecturing",
+        "confidence": 0.1,
+        "readable": "Instructor Lecturing"
+      }
+    ],
+    "video_path": "D:\\_GITHUB\\COPUS-ML\\data\\processed\\20191101\\20191101_016.mp4",
+    "timestamp": "2025-09-17T21:58:04.963694",
+    "model_type": "base"
+  },
+  {
+    "description": "In the classroom, a teacher is writing on the blackboard. A student sitting in front of him picks up his book and looks at it intently while another person sits nearby watching attentively as well.",
+    "has_classifier": false,
+    "predictions": [
+      {
+        "action": "instructor_lecturing",
+        "confidence": 0.1,
+        "readable": "Instructor Lecturing"
+      }
+    ],
+    "video_path": "D:\\_GITHUB\\COPUS-ML\\data\\processed\\20191101\\20191101_017.mp4",
+    "timestamp": "2025-09-17T21:59:09.956298",
+    "model_type": "base"
+  },
+  {
+    "description": "The video takes place in a classroom. A teacher is walking around the front of his class, writing on an empty chalkboard while students are sitting at their desks and taking notes or reading from books placed before them as he writes information onto another board across the room with other instructional material already written there.",
+    "has_classifier": false,
+    "predictions": [
+      {
+        "action": "student_writing",
+        "confidence": 0.5,
+        "readable": "Student Writing"
+      },
+      {
+        "action": "instructor_moving",
+        "confidence": 0.5,
+        "readable": "Instructor Moving"
+      }
+    ],
+    "video_path": "D:\\_GITHUB\\COPUS-ML\\data\\processed\\20191101\\20191101_018.mp4",
+    "timestamp": "2025-09-17T22:00:23.915779",
+    "model_type": "base"
+  },
+  {
+    "description": "The video takes place in a classroom, where the teacher is teaching and writing on two blackboards. The students are sitting at their desks learning from him.",
+    "has_classifier": false,
+    "predictions": [
+      {
+        "action": "instructor_lecturing",
+        "confidence": 0.1,
+        "readable": "Instructor Lecturing"
+      }
+    ],
+    "video_path": "D:\\_GITHUB\\COPUS-ML\\data\\processed\\20191101\\20191101_019.mp4",
+    "timestamp": "2025-09-17T22:01:24.206629",
+    "model_type": "base"
+  },
+  {
+    "description": "In the classroom, a man is teaching students while writing on the blackboard. Students are sitting at their desks and studying attentively.",
+    "has_classifier": false,
+    "predictions": [
+      {
+        "action": "instructor_lecturing",
+        "confidence": 0.1,
+        "readable": "Instructor Lecturing"
+      }
+    ],
+    "video_path": "D:\\_GITHUB\\COPUS-ML\\data\\processed\\20191101\\20191101_020.mp4",
+    "timestamp": "2025-09-17T22:02:22.563738",
+    "model_type": "base"
+  },
+  {
+    "description": "A student is standing up and walking to the front of a classroom. He walks between other students sitting at tables, past another chalkboard on his left side where an older man in a green shirt stands with arms outstretched talking as he moves forward along it.",
+    "has_classifier": false,
+    "predictions": [
+      {
+        "action": "instructor_lecturing",
+        "confidence": 0.1,
+        "readable": "Instructor Lecturing"
+      }
+    ],
+    "video_path": "D:\\_GITHUB\\COPUS-ML\\data\\processed\\20191101\\20191101_021.mp4",
+    "timestamp": "2025-09-17T22:03:33.241212",
+    "model_type": "base"
+  },
+  {
+    "description": "In a classroom, two men are standing in front of the chalkboard. The man on the left is talking to his companion while moving towards an open door and finally turning back around before leaving through it again as another student enters from that same direction.",
+    "has_classifier": false,
+    "predictions": [
+      {
+        "action": "instructor_lecturing",
+        "confidence": 0.1,
+        "readable": "Instructor Lecturing"
+      }
+    ],
+    "video_path": "D:\\_GITHUB\\COPUS-ML\\data\\processed\\20191101\\20191101_022.mp4",
+    "timestamp": "2025-09-17T22:04:42.465512",
+    "model_type": "base"
+  },
+  {
+    "description": "The video shows a classroom where the teacher is talking to students, and some of them are writing on paper. The professor walks around the room speaking with one student while another person follows him out through the door in back.",
+    "has_classifier": false,
+    "predictions": [
+      {
+        "action": "instructor_lecturing",
+        "confidence": 0.1,
+        "readable": "Instructor Lecturing"
+      }
+    ],
+    "video_path": "D:\\_GITHUB\\COPUS-ML\\data\\processed\\20191101\\20191101_023.mp4",
+    "timestamp": "2025-09-17T22:05:48.855858",
+    "model_type": "base"
+  },
+  {
+    "description": "A teacher talks to students in a classroom. Students are writing notes on paper while the camera shakes slightly.",
+    "has_classifier": false,
+    "predictions": [
+      {
+        "action": "instructor_lecturing",
+        "confidence": 0.1,
+        "readable": "Instructor Lecturing"
+      }
+    ],
+    "video_path": "D:\\_GITHUB\\COPUS-ML\\data\\processed\\20191101\\20191101_024.mp4",
+    "timestamp": "2025-09-17T22:06:44.429770",
+    "model_type": "base"
+  },
+  {
+    "description": "A teacher is talking to students in a classroom.",
+    "has_classifier": false,
+    "predictions": [
+      {
+        "action": "instructor_lecturing",
+        "confidence": 0.1,
+        "readable": "Instructor Lecturing"
+      }
+    ],
+    "video_path": "D:\\_GITHUB\\COPUS-ML\\data\\processed\\20191101\\20191101_025.mp4",
+    "timestamp": "2025-09-17T22:07:34.801982",
+    "model_type": "base"
+  },
+  {
+    "description": "In a classroom, some students are sitting on chairs and tables while two people walk towards the front of the room. The man in blue is writing something down near the blackboard as they approach him.",
+    "has_classifier": false,
+    "predictions": [
+      {
+        "action": "instructor_lecturing",
+        "confidence": 0.1,
+        "readable": "Instructor Lecturing"
+      }
+    ],
+    "video_path": "D:\\_GITHUB\\COPUS-ML\\data\\processed\\20191101\\20191101_026.mp4",
+    "timestamp": "2025-09-17T22:08:39.314816",
+    "model_type": "base"
+  },
+  {
+    "description": "The camera is moving from right to left in the classroom. On the stage, there are three people standing and facing away from the lens: one man with his back turned towards us wearing a blue shirt; another woman beside him also has her back to the lens but she's wearing a black-and-white checkered top; an older man on the far left side of the frame is walking around while looking at what he holds in his hands. He wears a green shirt with beige pants.\n\nIn front of this group of people, two men sit down together next to each other, both dressed casually in white hoodies. A few seconds later, more students appear sitting at their desks behind these two boys near the bottom edge of the screen.\n\nThe teacher walks over to where most of the class sits, talking to them as they listen attentively before turning toward some chairs that need arranging by hand.",
+    "has_classifier": false,
+    "predictions": [
+      {
+        "action": "instructor_moving",
+        "confidence": 1.0,
+        "readable": "Instructor Moving"
+      }
+    ],
+    "video_path": "D:\\_GITHUB\\COPUS-ML\\data\\processed\\20191101\\20191101_027.mp4",
+    "timestamp": "2025-09-17T22:10:49.457480",
+    "model_type": "base"
+  },
+  {
+    "description": "A man in a green shirt is talking to students who are sitting at desks. The woman in red puts down her bag and hands out papers, while the others listen attentively or engage with their own materials.",
+    "has_classifier": false,
+    "predictions": [
+      {
+        "action": "instructor_lecturing",
+        "confidence": 0.1,
+        "readable": "Instructor Lecturing"
+      }
+    ],
+    "video_path": "D:\\_GITHUB\\COPUS-ML\\data\\processed\\20191101\\20191101_028.mp4",
+    "timestamp": "2025-09-17T22:11:54.941707",
+    "model_type": "base"
+  },
+  {
+    "description": "A group of people are in a classroom, sitting at tables and writing on papers. A man stands talking to them as they work.",
+    "has_classifier": false,
+    "predictions": [
+      {
+        "action": "instructor_lecturing",
+        "confidence": 0.1,
+        "readable": "Instructor Lecturing"
+      }
+    ],
+    "video_path": "D:\\_GITHUB\\COPUS-ML\\data\\processed\\20191101\\20191101_029.mp4",
+    "timestamp": "2025-09-17T22:12:53.340456",
+    "model_type": "base"
+  },
+  {
+    "description": "In the classroom, a man in green is speaking to students. The woman at front center wearing red shakes her head as she speaks and looks down at notes on paper before looking up again. Students are sitting around tables listening intently while taking notes with pens or writing pads.",
+    "has_classifier": false,
+    "predictions": [
+      {
+        "action": "student_writing",
+        "confidence": 1.0,
+        "readable": "Student Writing"
+      }
+    ],
+    "video_path": "D:\\_GITHUB\\COPUS-ML\\data\\processed\\20191101\\20191101_030.mp4",
+    "timestamp": "2025-09-17T22:14:04.940157",
+    "model_type": "base"
+  },
+  {
+    "description": "A group of students are seated around a table, working on their assignments. A man is standing in front of them talking to the class about something while they listen attentively and take notes.",
+    "has_classifier": false,
+    "predictions": [
+      {
+        "action": "instructor_lecturing",
+        "confidence": 0.1,
+        "readable": "Instructor Lecturing"
+      }
+    ],
+    "video_path": "D:\\_GITHUB\\COPUS-ML\\data\\processed\\20191101\\20191101_031.mp4",
+    "timestamp": "2025-09-17T22:15:08.516502",
+    "model_type": "base"
+  },
+  {
+    "description": "In the video, a group of students are sitting in desks working on their homework. A man walks into the room and stands by one student talking to him while another boy is walking around behind them holding his bag over both shoulders as he talks with someone else near the door. The camera slowly pans right revealing more people doing work at their seats or standing up conversing among themselves.",
+    "has_classifier": false,
+    "predictions": [
+      {
+        "action": "instructor_moving",
+        "confidence": 1.0,
+        "readable": "Instructor Moving"
+      }
+    ],
+    "video_path": "D:\\_GITHUB\\COPUS-ML\\data\\processed\\20191101\\20191101_032.mp4",
+    "timestamp": "2025-09-17T22:16:30.031977",
+    "model_type": "base"
+  },
+  {
+    "description": "In the classroom, a teacher is talking to students while giving instructions. Students are sitting at their desks and working on assignments.",
+    "has_classifier": false,
+    "predictions": [
+      {
+        "action": "instructor_lecturing",
+        "confidence": 0.1,
+        "readable": "Instructor Lecturing"
+      }
+    ],
+    "video_path": "D:\\_GITHUB\\COPUS-ML\\data\\processed\\20191101\\20191101_033.mp4",
+    "timestamp": "2025-09-17T22:17:27.443101",
+    "model_type": "base"
+  },
+  {
+    "description": "A man is talking to a student who walks across the front of his classroom.",
+    "has_classifier": false,
+    "predictions": [
+      {
+        "action": "instructor_lecturing",
+        "confidence": 0.1,
+        "readable": "Instructor Lecturing"
+      }
+    ],
+    "video_path": "D:\\_GITHUB\\COPUS-ML\\data\\processed\\20191101\\20191101_034.mp4",
+    "timestamp": "2025-09-17T22:18:21.153352",
+    "model_type": "base"
+  },
+  {
+    "description": "The video shows a classroom lecture. The teacher is talking about the windmill, and students are watching attentively.",
+    "has_classifier": false,
+    "predictions": [
+      {
+        "action": "instructor_lecturing",
+        "confidence": 0.1,
+        "readable": "Instructor Lecturing"
+      }
+    ],
+    "video_path": "D:\\_GITHUB\\COPUS-ML\\data\\processed\\20191101\\20191101_035.mp4",
+    "timestamp": "2025-09-17T22:19:17.678566",
+    "model_type": "base"
+  },
+  {
+    "description": "A professor is walking around the classroom talking to students. Two new people enter and talk with him as well before they leave again.",
+    "has_classifier": false,
+    "predictions": [
+      {
+        "action": "instructor_moving",
+        "confidence": 1.0,
+        "readable": "Instructor Moving"
+      }
+    ],
+    "video_path": "D:\\_GITHUB\\COPUS-ML\\data\\processed\\20191101\\20191101_036.mp4",
+    "timestamp": "2025-09-17T22:20:15.583939",
+    "model_type": "base"
+  },
+  {
+    "description": "A man in green is talking to a student, then shaking hands with the female teacher. The students are sitting and watching them enter into this classroom.",
+    "has_classifier": false,
+    "predictions": [
+      {
+        "action": "instructor_lecturing",
+        "confidence": 0.1,
+        "readable": "Instructor Lecturing"
+      }
+    ],
+    "video_path": "D:\\_GITHUB\\COPUS-ML\\data\\processed\\20191101\\20191101_037.mp4",
+    "timestamp": "2025-09-17T22:21:15.395851",
+    "model_type": "base"
+  },
+  {
+    "description": "In the classroom, a teacher is talking to his students. A student walks in and stops by their desk.",
+    "has_classifier": false,
+    "predictions": [
+      {
+        "action": "instructor_lecturing",
+        "confidence": 0.1,
+        "readable": "Instructor Lecturing"
+      }
+    ],
+    "video_path": "D:\\_GITHUB\\COPUS-ML\\data\\processed\\20191101\\20191101_038.mp4",
+    "timestamp": "2025-09-17T22:22:11.451816",
+    "model_type": "base"
+  },
+  {
+    "description": "A classroom with a group of students. A young man in blue walks to the front, picks up some papers and talks briefly before turning back towards his seat at the table where other kids are sitting down looking forward. Another student is standing near the door talking to an older gentleman wearing green.",
+    "has_classifier": false,
+    "predictions": [
+      {
+        "action": "instructor_lecturing",
+        "confidence": 0.1,
+        "readable": "Instructor Lecturing"
+      }
+    ],
+    "video_path": "D:\\_GITHUB\\COPUS-ML\\data\\processed\\20191101\\20191101_039.mp4",
+    "timestamp": "2025-09-17T22:23:24.480985",
+    "model_type": "base"
+  },
+  {
+    "description": "In the classroom, a man is handing out papers. A woman stands at attention near the door while two men are talking to each other nearby as they wait for their turn in line.",
+    "has_classifier": false,
+    "predictions": [
+      {
+        "action": "instructor_lecturing",
+        "confidence": 0.1,
+        "readable": "Instructor Lecturing"
+      }
+    ],
+    "video_path": "D:\\_GITHUB\\COPUS-ML\\data\\processed\\20191101\\20191101_040.mp4",
+    "timestamp": "2025-09-17T22:24:27.554552",
+    "model_type": "base"
+  },
+  {
+    "description": "A woman is speaking with a man and a student in front of her.",
+    "has_classifier": false,
+    "predictions": [
+      {
+        "action": "instructor_lecturing",
+        "confidence": 0.1,
+        "readable": "Instructor Lecturing"
+      }
+    ],
+    "video_path": "D:\\_GITHUB\\COPUS-ML\\data\\processed\\20191101\\20191101_041.mp4",
+    "timestamp": "2025-09-17T22:25:20.298737",
+    "model_type": "base"
+  },
+  {
+    "description": "In the classroom, a woman and two men are standing at the front of room. The man in green is talking to her while she listens with hands on hips. A camera set up on tripod stands ready behind them as several students sit facing forward paying attention towards what they say.",
+    "has_classifier": false,
+    "predictions": [
+      {
+        "action": "student_listening",
+        "confidence": 1.0,
+        "readable": "Student Listening"
+      }
+    ],
+    "video_path": "D:\\_GITHUB\\COPUS-ML\\data\\processed\\20191101\\20191101_042.mp4",
+    "timestamp": "2025-09-17T22:26:32.406901",
+    "model_type": "base"
+  },
+  {
+    "description": "The camera moves forward and we see the back of two people\u2019s heads sitting at a table. In front, there are three adults standing in conversation with each other near an open door. One woman stands facing them with her hands on her hips while they both look down towards her as if listening to what she is saying or asking questions about something that was said earlier by one person not visible here who might have just left through this same doorway behind us where only darkness can be seen beyond it now since no light comes from outside into our view frame anymore due to closed blinds covering all windows around these individuals inside this classroom space filled with various objects like chairs tables tripods microphones etc., which suggests some kind of educational setting perhaps involving presentations lectures discussions among peers or instructors taking place right after someone exits via mentioned exit point creating brief pause before resuming whatever activity had been interrupted previously by their departure.",
+    "has_classifier": false,
+    "predictions": [
+      {
+        "action": "instructor_lecturing",
+        "confidence": 0.1,
+        "readable": "Instructor Lecturing"
+      }
+    ],
+    "video_path": "D:\\_GITHUB\\COPUS-ML\\data\\processed\\20191101\\20191101_043.mp4",
+    "timestamp": "2025-09-17T22:28:42.482431",
+    "model_type": "base"
+  },
+  {
+    "description": "In a classroom, three people are talking to each other. The man in green shirt is explaining something with hand gestures and the woman listening him carefully while nodding her head occasionally.",
+    "has_classifier": false,
+    "predictions": [
+      {
+        "action": "instructor_lecturing",
+        "confidence": 0.1,
+        "readable": "Instructor Lecturing"
+      }
+    ],
+    "video_path": "D:\\_GITHUB\\COPUS-ML\\data\\processed\\20191101\\20191101_044.mp4",
+    "timestamp": "2025-09-17T22:29:45.104158",
+    "model_type": "base"
+  },
+  {
+    "description": "In the classroom, a man and two students are standing near an open door. The teacher is talking to them while using hand gestures for emphasis as he explains something related to his lesson plan.",
+    "has_classifier": false,
+    "predictions": [
+      {
+        "action": "instructor_lecturing",
+        "confidence": 0.1,
+        "readable": "Instructor Lecturing"
+      }
+    ],
+    "video_path": "D:\\_GITHUB\\COPUS-ML\\data\\processed\\20191101\\20191101_045.mp4",
+    "timestamp": "2025-09-17T22:30:48.645584",
+    "model_type": "base"
+  },
+  {
+    "description": "A woman is talking to two men in a classroom.",
+    "has_classifier": false,
+    "predictions": [
+      {
+        "action": "instructor_lecturing",
+        "confidence": 0.1,
+        "readable": "Instructor Lecturing"
+      }
+    ],
+    "video_path": "D:\\_GITHUB\\COPUS-ML\\data\\processed\\20191101\\20191101_046.mp4",
+    "timestamp": "2025-09-17T22:31:39.523381",
+    "model_type": "base"
+  },
+  {
+    "description": "In a classroom, the teacher is talking to two students. The girl in black dress and spectacles stands with her hands on hips while facing towards him. Then she turns around backwards for some time before turning back again as he gives his thumb up sign.",
+    "has_classifier": false,
+    "predictions": [
+      {
+        "action": "instructor_lecturing",
+        "confidence": 0.1,
+        "readable": "Instructor Lecturing"
+      }
+    ],
+    "video_path": "D:\\_GITHUB\\COPUS-ML\\data\\processed\\20191101\\20191101_047.mp4",
+    "timestamp": "2025-09-17T22:32:33.635533",
+    "model_type": "base"
+  }
+]
