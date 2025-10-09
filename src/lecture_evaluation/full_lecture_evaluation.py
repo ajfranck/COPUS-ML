@@ -184,6 +184,17 @@ class FullLectureEvaluator:
                     self.checkpoint_path = sorted(checkpoints)[-1]
                     logger.info(f"Found checkpoint: {self.checkpoint_path}")
 
+        quantization_config = None
+        if self.device == "cuda":
+            from transformers import BitsAndBytesConfig
+            quantization_config = BitsAndBytesConfig(
+                load_in_8bit=True,
+                llm_int8_threshold=6.0
+            )
+            logger.info("Using 8-bit quantization to reduce memory usage")
+
+        model_path = str(self.checkpoint_path) if self.checkpoint_path else base_model
+
         if self.checkpoint_path:
             self.model = AutoModel.from_pretrained(
                 str(self.checkpoint_path),
@@ -204,14 +215,18 @@ class FullLectureEvaluator:
             self.model = AutoModel.from_pretrained(
                 base_model,
                 trust_remote_code=True,
+                quantization_config=quantization_config,
+                device_map = "auto",
                 attn_implementation="sdpa",
-                torch_dtype=torch.bfloat16,
+                torch_dtype=torch.float16,
+                low_cpu_mem_usage=True,
+
             )
             self.tokenizer = AutoTokenizer.from_pretrained(
                 base_model, trust_remote_code=True
             )
 
-        self.model = self.model.eval().to(self.device)
+        self.model = self.model.eval()
 
     def load_classifier(self, classifier_path):
 
