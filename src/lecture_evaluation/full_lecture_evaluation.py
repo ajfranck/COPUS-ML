@@ -17,6 +17,7 @@ import argparse
 from collections import defaultdict
 import time
 import tempfile
+import re
 
 try:
     import ffmpeg
@@ -203,6 +204,7 @@ class FullLectureEvaluator:
             logger.info(f"Loading base model: {base_model}")
             self.model = AutoModel.from_pretrained(
                 base_model,
+                device_map="auto",
                 trust_remote_code=True,
                 attn_implementation="sdpa",
                 torch_dtype=torch.bfloat16,
@@ -282,6 +284,66 @@ class FullLectureEvaluator:
                     pass
             return None
 
+    def parse_action_classifications(self, model_response: str) -> Dict[str, float]:
+        """
+        Parse model  response to hopefully get action classifications and confidence scores
+        
+        Returns:
+            Dictionary mapping action codes to confidence scores (0.0-1.0)
+        """
+        predictions = {}
+        
+        confidence_map = {
+            "high": 0.9,
+            "medium": 0.6,
+            "low": 0.3
+        }
+        
+        if "DETECTED ACTIONS:" in model_response:
+            actions_section = model_response.split("DETECTED ACTIONS:")[1]
+            
+            lines = actions_section.split('\n')
+            for line in lines:
+                line = line.strip()
+                if not line or line.startswith('Example:'):
+                    continue
+                    
+                # try and match: action_code: confidence - justification
+                for action in COPUS_ACTIONS.keys():
+                    if line.startswith(action + ":"):
+                        confidence_str = "medium"  # default
+                        for conf_word in ["high", "medium", "low"]:
+                            if conf_word in line.lower():
+                                confidence_str = conf_word
+                                break
+                        
+                        predictions[action] = confidence_map[confidence_str]
+                        break
+        
+        # some fallback in case it fails (unlikely)
+        if not predictions:
+            # look for common patterns in the response
+            response_lower = model_response.lower()
+            
+            if "instructor" in response_lower and ("lecturing" in response_lower or "explaining" in response_lower or "presenting" in response_lower):
+                predictions["instructor_lecturing"] = 0.5
+            
+            if "students" in response_lower and ("listening" in response_lower or "watching" in response_lower or "taking notes" in response_lower):
+                predictions["student_listening"] = 0.5
+            
+            if "writing on" in response_lower and "board" in response_lower:
+                predictions["instructor_real_time_writing"] = 0.5
+            
+            if "group" in response_lower and ("discussion" in response_lower or "working together" in response_lower):
+                predictions["student_other_group"] = 0.5
+            
+            # if nothinhg default to most common scenario
+            if not predictions:
+                predictions["instructor_lecturing"] = 0.3
+                predictions["student_listening"] = 0.3
+        
+        return predictions
+
     def evaluate_window(self, frames: List[Image.Image], temporal_ids: List) -> Dict:
         """
         Evaluate a single window of frames
@@ -289,9 +351,37 @@ class FullLectureEvaluator:
         Returns:
             Dictionary with detected actions and confidence scores
         """
-        from prompt import question
+        # Create the classification prompt
+        copus_actions_list = "\n".join([f"- {action}: {COPUS_LABELS[action]}" for action in COPUS_ACTIONS.keys()])
+        
+        classification_prompt = f"""Analyze this classroom video and identify ALL COPUS actions that are currently occurring.
 
-        msgs = [{"role": "user", "content": frames + [question]}]
+        COPUS Actions to identify:
+        {copus_actions_list}
+
+        Instructions:
+        1. Watch the video segment carefully
+        2. Identify ALL actions that are happening (there can be multiple simultaneous actions)
+        3. For each action you identify, provide:
+        - The exact action code from the list above
+        - Your confidence level (high, medium, or low)
+        - A brief justification
+
+        Format your response as:
+        DETECTED ACTIONS:
+        [action_code_1]: [confidence_level] - [brief justification]
+        [action_code_2]: [confidence_level] - [brief justification]
+        ...
+
+        Example:
+        DETECTED ACTIONS:
+        instructor_lecturing: high - The instructor is standing at the board explaining concepts
+        student_listening: high - Students are sitting and watching the instructor
+        student_individual_thinking: medium - Some students appear to be working on problems individually
+
+        Be thorough and identify ALL observable actions. Multiple actions often occur simultaneously."""
+
+        msgs = [{"role": "user", "content": frames + [classification_prompt]}]
 
         try:
             with torch.no_grad():
@@ -303,48 +393,13 @@ class FullLectureEvaluator:
                     temporal_ids=temporal_ids,
                 )
 
-            # this was if we wanted to use a classifier but seems like rule-based is better
-            if self.classifier is not None:
-                # some random placeholder thing i made
-                features = torch.randn(1, 4096).to(self.device)
-                logits = self.classifier(features)
-                probs = torch.softmax(logits, dim=1)
-
-                top_k = 5  # top 5 preds
-                top_probs, top_indices = torch.topk(probs[0], top_k)
-
-                predictions = {}
-                for prob, idx in zip(top_probs, top_indices):
-                    action_name = ACTIONS_REVERSE[idx.item()]
-                    predictions[action_name] = prob.item()
-            else:
-                predictions = self.rule_based_classification(answer)
+            predictions = self.parse_action_classifications(answer)
 
             return {"description": answer, "predictions": predictions}
 
         except Exception as e:
             logger.error(f"Error evaluating window: {e}")
             return {"error": str(e), "predictions": {}}
-
-    def rule_based_classification(self, description: str) -> Dict[str, float]:
-        """Rule-based classification based on keywords"""
-        description_lower = description.lower()
-
-        from keywords import action_keywords
-
-        scores = {}
-        for action, keywords in action_keywords.items():
-            score = sum(1 for keyword in keywords if keyword in description_lower)
-            if score > 0:
-                scores[action] = score
-
-        # normalize scores
-        if scores:
-            total = sum(scores.values())
-            return {action: score / total for action, score in scores.items()}
-        else:
-            # default to most common as a fallback (maybe remove this?)
-            return {"instructor_lecturing": 0.5}
 
     def evaluate_full_lecture(
         self,
@@ -441,6 +496,7 @@ class FullLectureEvaluator:
                         "start_time": window_start_sec,
                         "end_time": window_end_sec,
                         "predictions": result.get("predictions", {}),
+                        "raw_response": result.get("description", "")
                     }
                 )
 
