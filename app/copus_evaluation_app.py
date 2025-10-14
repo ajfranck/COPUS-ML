@@ -151,29 +151,27 @@ class COPUSEvaluationApp:
         logger.info(f"COPUS VIDEO EVALUATION")
         logger.info(f"{'='*60}")
         logger.info(f"Video: {video_path.name}")
-        logger.info(f"Output directory: {output_dir}")
+        logger.info(f"Output direc: {output_dir}")
         logger.info(f"{'='*60}\n")
 
         if self.evaluator is None:
             self.initialize_evaluator()
 
-        logger.info("Step 1/3: Evaluating video...")
+        logger.info("Step 1/3: Evaluating")
         evaluation_results = self.evaluator.evaluate_full_lecture(
             str(video_path), str(json_path)
         )
 
         if "error" in evaluation_results:
-            raise RuntimeError(
-                f"Video evaluation failed: {evaluation_results['error']}"
-            )
+            raise RuntimeError(f"evaluation fail: {evaluation_results['error']}")
 
-        logger.info(f"✓ JSON results saved: {json_path.name}")
+        logger.info(f"JSON results: {json_path.name}")
 
-        logger.info("\nStep 2/3: Converting to Excel format...")
+        logger.info("\nStep 2/3: Convert to excel")
         self.convert_json_to_excel(json_path, excel_path)
-        logger.info(f"✓ Excel file created: {excel_path.name}")
+        logger.info(f"excel: {excel_path.name}")
 
-        logger.info("\nStep 3/3: Generating summary...")
+        logger.info("\nStep 3/3: Summary")
         self.generate_summary_report(
             evaluation_results, output_dir, video_stem, timestamp
         )
@@ -207,7 +205,7 @@ class COPUSEvaluationApp:
 
         df = pd.DataFrame(records)
         if df.empty:
-            logger.warning("No action data found in JSON")
+            logger.warning("No action data!!")
             return
 
         pivot_df = df.pivot_table(
