@@ -1,0 +1,44 @@
+# Core dependencies
+torch>=2.0.0
+torchvision>=0.15.0
+transformers>=4.35.0
+numpy>=1.21.0
+pandas>=1.3.0
+scipy>=1.7.0
+Pillow>=9.0.0
+
+# Video processing
+decord>=0.6.0
+ffmpeg-python>=0.2.0
+
+# Excel generation
+xlsxwriter>=3.0.0
+openpyxl>=3.0.0
+
+# GUI dependencies (optional, only needed for copus_gui.py)
+# Tkinter is usually included with Python, but if not:
+# tk>=8.6
+
+# Progress bars and logging
+tqdm>=4.62.0
+
+# Vision-Language Model
+# Note: This will install the model requirements
+# You may need to install specific versions based on your CUDA version
+# For CUDA 11.8:
+# torch==2.0.0+cu118 -f https://download.pytorch.org/whl/torch_stable.html
+
+# Model specific (MiniCPM-V)
+sentencepiece>=0.1.99
+protobuf>=3.20.0
+accelerate>=0.20.0
+
+# Optional: For development
+pytest>=7.0.0
+black>=22.0.0
+flake8>=4.0.0
+jupyter>=1.0.0
+matplotlib>=3.5.0
+
+# System info
+psutil>=5.9.0
