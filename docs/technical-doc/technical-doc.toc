@@ -30,5 +30,5 @@
 \contentsline {chapter}{\numberline {7}Troubleshooting}{16}{chapter.7}%
 \contentsline {section}{\numberline {7.1}Common Issues}{16}{section.7.1}%
 \contentsline {section}{\numberline {7.2}FAQ}{16}{section.7.2}%
-\contentsline {chapter}{\numberline {A}COPUS Code Reference}{17}{appendix.A}%
-\contentsline {chapter}{\numberline {B}Model Architecture}{18}{appendix.B}%
+\contentsline {chapter}{\numberline {A}COPUS Code Reference}{18}{appendix.A}%
+\contentsline {chapter}{\numberline {B}Model Architecture}{19}{appendix.B}%

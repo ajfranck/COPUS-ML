@@ -656,21 +656,21 @@ json_path, excel_path = app.evaluate_video("lecture.mp4", "results/")
 
 \section{Common Issues}
 
-\textbf{CUDA Out of Memory:}
+\subsection*{CUDA Out of Memory:}
 \begin{itemize}
-    \item Use \texttt{--device cpu}
     \item Close other GPU applications
     \item Reduce video resolution
+    \item Switch computers, cluster, or as a last case resort (extremely slow) use \texttt{--device cpu}
 \end{itemize}
 
-\textbf{FFmpeg Not Found:}
+\subsection*{FFmpeg Not Found:}
 \begin{itemize}
     \item Ubuntu: \texttt{sudo apt install ffmpeg}
     \item macOS: \texttt{brew install ffmpeg}
     \item Windows: Download from ffmpeg.org, add to PATH
 \end{itemize}
 
-\textbf{Model Loading Errors:}
+\subsection*{Model Loading Errors:}
 \begin{itemize}
     \item Verify checkpoint directory exists
     \item Ensure internet connection for base model download
@@ -682,14 +682,15 @@ json_path, excel_path = app.evaluate_video("lecture.mp4", "results/")
 % \textbf{Q: How accurate is the system?}\\
 % A: With fine-tuning: 75-85\% overall, 85-95\% for high-frequency actions.
 
-\textbf{Q: What video formats are supported?}\\
+\subsection*{Q: What video formats are supported?}
 A: MP4, AVI, MOV directly. MTS auto-converts to MP4.
 
-\textbf{Q: Can I modify the 2-minute interval?}\\
+\subsection*{Q: Can I modify the 2-minute interval?}
 A: Yes, change \texttt{AGGREGATION\_INTERVAL} in \texttt{full\_lecture\_evaluation.py}.
 
-\textbf{Q: How to interpret confidence scores?}\\
-A: 1.0 = high confidence, 0.5-0.99 = medium, 0.25-0.49 = low (filtered out), <0.25 = "Houston, we have a problem".
+\subsection*{Q: How to interpret confidence scores?}
+A: 1.0 = high confidence, 0.5-0.99 = medium, 0.25-0.49 = low (filtered out), 0-0.25 = "Houston, we have a problem".
+
 
 \appendix
 
