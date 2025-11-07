@@ -112,17 +112,20 @@ class COPUSEvaluationApp:
         "TO",
     ]
 
-    def __init__(self, model_checkpoint=None, device="cuda"):
+    def __init__(self, model_checkpoint=None, hf_model_repo=None, device="cuda"):
         self.model_checkpoint = model_checkpoint
+        self.hf_model_repo = hf_model_repo
         self.device = device
         self.evaluator = None
 
     def initialize_evaluator(self):
-        logger.info("Intializing the evaluator...")
+        logger.info("Initializing evaluator")
         self.evaluator = FullLectureEvaluator(
-            checkpoint_path=self.model_checkpoint, device=self.device
+            checkpoint_path=self.model_checkpoint,
+            hf_model_repo=self.hf_model_repo,
+            device=self.device
         )
-        logger.info("Evaluator initialized")
+        logger.info("Evaluator ready")
 
     def evaluate_video(self, video_path, output_dir):
         """
@@ -147,17 +150,17 @@ class COPUSEvaluationApp:
         json_path = output_dir / f"{video_stem}_copus_{timestamp}.json"
         excel_path = output_dir / f"{video_stem}_copus_{timestamp}.xlsx"
 
-        logger.info(f"\n{'='*60}")
-        logger.info(f"COPUS VIDEO EVALUATION")
-        logger.info(f"{'='*60}")
+        logger.info("-" * 60)
+        logger.info(f"COPUS Video Evaluation")
+        logger.info("-" * 60)
         logger.info(f"Video: {video_path.name}")
-        logger.info(f"Output direc: {output_dir}")
-        logger.info(f"{'='*60}\n")
+        logger.info(f"Output dir: {output_dir}")
+        logger.info("-" * 60)
 
         if self.evaluator is None:
             self.initialize_evaluator()
 
-        logger.info("Step 1/3: Evaluating")
+        logger.info("Step 1/3: Evaluating video")
         evaluation_results = self.evaluator.evaluate_full_lecture(
             str(video_path), str(json_path)
         )
@@ -165,13 +168,13 @@ class COPUSEvaluationApp:
         if "error" in evaluation_results:
             raise RuntimeError(f"evaluation fail: {evaluation_results['error']}")
 
-        logger.info(f"JSON results: {json_path.name}")
+        logger.info(f"JSON saved: {json_path.name}")
 
-        logger.info("\nStep 2/3: Convert to excel")
+        logger.info("Step 2/3: Converting to Excel")
         self.convert_json_to_excel(json_path, excel_path)
-        logger.info(f"excel: {excel_path.name}")
+        logger.info(f"Excel saved: {excel_path.name}")
 
-        logger.info("\nStep 3/3: Summary")
+        logger.info("Step 3/3: Generating summary")
         self.generate_summary_report(
             evaluation_results, output_dir, video_stem, timestamp
         )
@@ -205,7 +208,7 @@ class COPUSEvaluationApp:
 
         df = pd.DataFrame(records)
         if df.empty:
-            logger.warning("No action data!!")
+            logger.warning("No action data")
             return
 
         pivot_df = df.pivot_table(
@@ -426,7 +429,7 @@ class COPUSEvaluationApp:
             f.write("END OF REPORT\n")
             f.write("=" * 60 + "\n")
 
-        logger.info(f"✓ Summary report saved: {report_path.name}")
+        logger.info(f"Summary saved: {report_path.name}")
 
 
 def main():
@@ -505,7 +508,7 @@ def main():
         logger.error(f"File not found: {e}")
         sys.exit(1)
     except Exception as e:
-        logger.error(f"Error during eval: {e}")
+        logger.error(f"Evaluation error: {e}")
         if args.verbose:
             import traceback
 

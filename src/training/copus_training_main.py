@@ -211,7 +211,7 @@ class COPUSTrainer:
         for param in self.vl_model.parameters():
             param.requires_grad = False
         
-        logger.info("✓ Vision-language model loaded and frozen")
+        logger.info("Vision-language model loaded and frozen")
         
         hidden_size = getattr(self.vl_model.config, 'hidden_size', 4096)
         self.classifier = COPUSClassifier(
@@ -219,7 +219,7 @@ class COPUSTrainer:
             num_classes=len(COPUS_ACTIONS)
         ).to(self.device)
         
-        logger.info(f"✓ Classifier initialized (input: {hidden_size}, output: {len(COPUS_ACTIONS)})")
+        logger.info(f"Classifier initialized (input: {hidden_size}, output: {len(COPUS_ACTIONS)})")
         
         self.criterion = nn.BCEWithLogitsLoss()
     
@@ -320,9 +320,9 @@ class COPUSTrainer:
         save_every: int = 2
     ):
         """Train classifier head"""
-        logger.info("=" * 60)
-        logger.info("Starting Training (Classifier Head Approach)")
-        logger.info("=" * 60)
+        logger.info("-" * 60)
+        logger.info("Starting training (classifier head approach)")
+        logger.info("-" * 60)
         logger.info(f"Training samples: {len(train_dataset)}")
         logger.info(f"Epochs: {epochs}, Batch size: {batch_size}, LR: {learning_rate}")
         
@@ -347,7 +347,7 @@ class COPUSTrainer:
         best_val_loss = float('inf')
         
         for epoch in range(epochs):
-            logger.info(f"\n{'='*60}\nEpoch {epoch + 1}/{epochs}\n{'='*60}")
+            logger.info(f"Epoch {epoch + 1}/{epochs}")
             
             # Training
             self.classifier.train()
@@ -404,25 +404,25 @@ class COPUSTrainer:
             
             avg_train_loss = train_loss / max(len(train_loader), 1)
             train_acc = 100 * train_correct / max(train_total, 1)
-            logger.info(f"Train Loss: {avg_train_loss:.4f}, Accuracy: {train_acc:.2f}%")
+            logger.info(f"Train loss: {avg_train_loss:.4f}, Accuracy: {train_acc:.2f}%")
             
             if val_dataset:
                 val_loss, val_acc = self.validate(val_dataset)
-                logger.info(f"Val Loss: {val_loss:.4f}, Accuracy: {val_acc:.2f}%")
+                logger.info(f"Val loss: {val_loss:.4f}, Accuracy: {val_acc:.2f}%")
                 
                 scheduler.step(val_loss)
                 
                 if val_loss < best_val_loss:
                     best_val_loss = val_loss
-                    logger.info(f"✓ New best validation loss!")
+                    logger.info("New best validation loss")
                     self.save_checkpoint(f"best_model", epoch + 1, val_loss)
             
             if (epoch + 1) % save_every == 0:
                 self.save_checkpoint(f"epoch_{epoch + 1}", epoch + 1, avg_train_loss)
         
-        logger.info("\n" + "=" * 60)
-        logger.info("Training Complete!")
-        logger.info("=" * 60)
+        logger.info("-" * 60)
+        logger.info("Training complete")
+        logger.info("-" * 60)
         
         final_name = f"final_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
         self.save_checkpoint(final_name, epochs, avg_train_loss)
@@ -503,7 +503,7 @@ class COPUSTrainer:
     def upload_to_hub(self, checkpoint_name: str):
         hf_token = os.getenv("HF_TOKEN")
         if not hf_token:
-            logger.warning("No HF_TOKEN environment variable found. Skipping upload.")
+            logger.warning("No HF_TOKEN found. Skipping upload")
             return
         
         try:
@@ -547,11 +547,11 @@ Trained on: {datetime.now().strftime('%Y-%m-%d')}
                 repo_type="model",
             )
             
-            logger.info(f"Successfully uploaded to https://huggingface.co/{self.hf_repo_id}")
+            logger.info(f"Uploaded to HuggingFace: {self.hf_repo_id}")
         
         except Exception as e:
             logger.error(f"Upload failed: {e}")
-            logger.info("Model saved locally but not uploaded to HuggingFace")
+            logger.info("Model saved locally but not uploaded")
 
 
 def main():
