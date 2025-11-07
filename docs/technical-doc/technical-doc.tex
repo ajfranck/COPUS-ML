@@ -41,15 +41,101 @@ Technical documentation for the COPUS (Classroom Observation Protocol for Underg
 
 \tableofcontents
 
+\chapter{Background and Prerequisites}
+
+\section{Understanding the Problem}
+
+\subsection{The COPUS Protocol}
+COPUS (Classroom Observation Protocol for Undergraduate STEM) is an tool to characterize instructional practices in STEM classrooms. Traditional COPUS coding requires:
+
+\begin{itemize}
+    \item Trained human observers watching classroom videos
+    \item Manual coding of behaviors every 2 minutes
+    \item Tracking 24 distinct behavioral codes (13 student, 11 instructor)
+    \item Time-intensive process: 1-2 hours per lecture video
+    \item Reliability concerns with multiple observers having variability
+\end{itemize}
+
+\subsection{Challenges}
+
+\textbf{Multi-label Classification:} Multiple behaviors can occur simultaneously within a 2-minute interval (e.g., students listening while instructor is lecturing and writing).
+
+\textbf{Temporal Reasoning:} The system must understand actions over time. A student raising their hand only becomes "Answering Question" (AnQ) when contextualized with instructor acknowledgment.
+
+\textbf{Fine-grained Activity Recognition:} Distinguishing between similar activities requires understanding subtle cues (e.g., "Clicker Group" vs. "Worksheet Group").
+
+\textbf{Variable Video Quality:} Classroom videos vary in resolution, lighting, camera angle, and audio quality. (Not the case in this implementation, all videos are relatively similar)
+
+\subsection{Sliding Window Approach}
+To handle full-length lectures (50-90 minutes), we employ a sliding window strategy:
+
+\begin{equation}
+W_i = [t_i, t_i + \Delta t], \quad t_i = i \cdot s
+\end{equation}
+
+Where:
+\begin{itemize}
+    \item $W_i$ = Window $i$
+    \item $\Delta t$ = Window duration (10 seconds)
+    \item $s$ = Step size (5 seconds)
+    \item Overlap = $\Delta t - s = 5$ seconds (50\%)
+\end{itemize}
+
+This creates dense coverage with overlapping predictions that are later aggregated.
+
+\subsection{Temporal Aggregation}
+For each 2-minute COPUS interval, we aggregate predictions from all overlapping windows using maximum confidence:
+
+\begin{equation}
+\hat{y}_{action,interval} = 
+\begin{cases} 
+1 & \text{if } \max_{w \in W_{interval}} c_{action,w} \geq 0.5 \\
+0 & \text{otherwise}
+\end{cases}
+\end{equation}
+
+Where $c_{action,w}$ is the confidence score for an action in window $w$. This strategy favors recall (capturing brief activities) over precision.
+
+\section{Technical Prerequisites}
+
+\subsection{Python and ML Libraries}
+\begin{itemize}
+    \item Python 3.9+
+    \item PyTorch: Tensor operations, model loading, GPU management
+    \item NumPy: Array operations, indexing
+    \item Pandas: DataFrame manipulation, pivot tables
+    \item Transformers (Hugging Face): Model APIs, tokenizers
+\end{itemize}
+
+\subsection{Video Processing}
+\textbf{FFmpeg:}
+\begin{itemize}
+    \item Transcoding (MTS → MP4)
+    \item Frame extraction at specific framerates
+\end{itemize}
+
+\subsection{Input/Output Formats}
+\textbf{Video Formats:}
+\begin{itemize}
+    \item Primary: MP4 (H.264 codec)
+    \item Auto-conversion: MTS
+    \item Supported: AVI, MOV
+\end{itemize}
+
+\textbf{Output Formats:}
+\begin{itemize}
+    \item JSON: Machine-readable with full confidence scores
+    \item Excel: Human-readable COPUS matrix with formulas
+    \item Text: Summary statistics and metadata
+\end{itemize}
+
 \chapter{System Overview}
 
 \section{Introduction}
 
-The COPUS system automates behavioral analysis of STEM classroom videos using deep learning. Traditional COPUS requires trained observers to manually code behaviors every 2 minutes.
-
 \textbf{Key Features:}
 \begin{itemize}
-    \item Automated full-lecture processing (50-90 min videos)
+    \item Automated full-lecture processing
     \item COPUS-compliant 2-minute interval coding
     \item Multiple interfaces: CLI, GUI, Python API
     \item Excel, JSON, and text report outputs
@@ -255,230 +341,184 @@ class COPUSEvaluationGUI:
         """Thread worker function"""
 \end{lstlisting}
 
-\subsection{Key Features}
+\section{Python API Usage}
 
-\textbf{Layout:}
-\begin{itemize}
-    \item Title and description section
-    \item Input configuration (video file, output directory)
-    \item Optional settings (model checkpoint, device selection)
-    \item Action buttons (Start, Cancel, Clear Log, Exit)
-    \item Progress bar (indeterminate during processing)
-    \item Scrollable log display (real-time feedback)
-\end{itemize}
+\begin{lstlisting}[caption={Programmatic Usage}]
+from copus_evaluation_app import COPUSEvaluationApp
+import json
 
-\textbf{Threading:}
-\begin{lstlisting}[caption={Non-blocking Evaluation}]
-def start_evaluation(self):
-    # Validate inputs
-    # Update UI state (disable start, enable cancel)
-    # Launch evaluation in thread
-    eval_thread = threading.Thread(
-        target=self.run_evaluation,
-        args=(video_file, output_dir),
-        daemon=True
-    )
-    eval_thread.start()
+# Initialize application
+app = COPUSEvaluationApp(device="cuda")
 
-def run_evaluation(self, video_file, output_dir):
-    try:
-        app = COPUSEvaluationApp(...)
-        json_path, excel_path = app.evaluate_video(...)
-        # Show success dialog
-        # Offer to open output directory
-    except Exception as e:
-        # Show error dialog
-    finally:
-        # Re-enable UI
-\end{lstlisting}
+# Evaluate video
+json_path, excel_path = app.evaluate_video(
+    "lecture.mp4", 
+    "results/"
+)
 
-\textbf{Platform-Specific Directory Opening:}
-\begin{lstlisting}[caption={Cross-Platform File Browser}]
-import platform, subprocess
-
-system = platform.system()
-if system == "Windows":
-    os.startfile(directory)
-elif system == "Darwin":  # macOS
-    subprocess.Popen(["open", directory])
-else:  # Linux
-    subprocess.Popen(["xdg-open", directory])
-\end{lstlisting}
-
-\textbf{Installation:}
-\begin{lstlisting}[language=bash]
-# Install PyTorch (adjust CUDA version for your gpu, system)
-pip install torch==2.0.0+cu118 -f \
-  https://download.pytorch.org/whl/torch_stable.html
-
-# Install dependencies
-pip install -r requirements.txt
-
-# optional FFMPEG install if you want to handle MTS files
+# Load and analyze results
+with open(json_path, 'r') as f:
+    results = json.load(f)
+    
+# Access interval data
+for interval in results['intervals']:
+    print(f"Interval {interval['interval_number']}")
+    for action, present in interval['actions'].items():
+        if present:
+            confidence = interval['actions_with_confidence'][action]
+            print(f"  {action}: {confidence:.2f}")
 \end{lstlisting}
 
 \chapter{Core Evaluation Engine}
 
 \section{full\_lecture\_evaluation.py}
 
-\subsection{Constants}
-
-\begin{lstlisting}[caption={Processing Parameters}]
-LECTURE_FPS = 3           # Target video FPS
-WINDOW_DURATION = 10      # Window size (seconds)
-WINDOW_FRAMES = 30        # Frames per window
-WINDOW_STEP = 5           # Step size (50% overlap)
-AGGREGATION_INTERVAL = 120  # 2-minute COPUS intervals
-
-MAX_NUM_FRAMES = 15       # Model frame limit
-MAX_NUM_PACKING = 2       # Frame packing factor
-TIME_SCALE = 0.1          # Temporal resolution
-\end{lstlisting}
-
-\subsection{Action Definitions}
-
-\begin{lstlisting}[caption={COPUS Action Mappings}]
-COPUS_ACTIONS = {
-    "student_listening": 0, "student_individual_thinking": 1,
-    "student_clicker_group": 2, "student_worksheet_group": 3,
-    "student_other_group": 4, "student_answer_question": 5,
-    "student_ask_question": 6, "student_whole_class_discussion": 7,
-    "student_prediction": 8, "student_presentation": 9,
-    "student_test_quiz": 10, "student_waiting": 11,
-    "student_other": 12,
-    "instructor_lecturing": 13, "instructor_real_time_writing": 14,
-    "instructor_follow_up": 15, "instructor_posing_question": 16,
-    "instructor_clicker_question": 17, 
-    "instructor_answering_question": 18,
-    "instructor_moving_guiding": 19, "instructor_one_on_one": 20,
-    "instructor_demo_video": 21, "instructor_administration": 22,
-    "instructor_waiting": 23,
-}
-
-COPUS_LABELS = {
-    "student_listening": "L - Listening/Taking Notes",
-    # ... full mappings
-}
-\end{lstlisting}
-
 \subsection{Class: FullLectureEvaluator}
 
-\begin{lstlisting}[caption={Evaluator Structure}]
+Central component that orchestrates video processing and model inference.
+
+\begin{lstlisting}[caption={Initialization}]
 class FullLectureEvaluator:
-    def __init__(self, checkpoint_path=None, 
-                 base_model="openbmb/MiniCPM-V-4_5", device="cuda"):
-        """Load VLM and optional fine-tuned classifier"""
+    def __init__(self, checkpoint_path=None, device="cuda"):
         self.device = device
-        self.model = AutoModel.from_pretrained(...)
-        self.tokenizer = AutoTokenizer.from_pretrained(...)
+        self.checkpoint_path = checkpoint_path
+        
+        # Load MiniCPM-V model
         if checkpoint_path:
-            self.load_classifier(checkpoint_path)
-    
-    def evaluate_window(self, frames, temporal_ids):
-        """Analyze 10-second window -> action predictions"""
-    
-    def evaluate_full_lecture(self, video_path, output_path):
-        """Process full video -> 2-minute intervals"""
-    
-    def aggregate_results(self, window_results, duration):
-        """Aggregate windows into COPUS intervals"""
-    
-    def parse_action_classifications(self, model_response):
-        """Extract actions from VLM text response"""
+            self.model = load_from_checkpoint(checkpoint_path)
+        else:
+            self.model = AutoModel.from_pretrained(
+                "openbmb/MiniCPM-V-2_6",
+                trust_remote_code=True
+            ).to(device)
+        
+        self.tokenizer = AutoTokenizer.from_pretrained(
+            "openbmb/MiniCPM-V-2_6",
+            trust_remote_code=True
+        )
 \end{lstlisting}
 
-\subsection{Window Evaluation}
+\subsection{evaluate\_full\_lecture Method}
 
-\begin{lstlisting}[caption={Window Processing}]
-def evaluate_window(self, frames, temporal_ids):
-    # Create prompt with all 24 COPUS actions
-    prompt = f"""Analyze this classroom video and identify 
-    ALL COPUS actions occurring.
+\begin{lstlisting}[caption={Main Evaluation Logic}]
+def evaluate_full_lecture(self, video_path, output_json_path):
+    # 1. Convert MTS to MP4 if needed
+    if video_path.endswith('.MTS'):
+        video_path = convert_mts_to_mp4(video_path)
     
-    COPUS Actions:
-    {list of all actions with descriptions}
+    # 2. Load video and extract metadata
+    video_reader = VideoReader(video_path)
+    fps = video_reader.get_avg_fps()
+    total_frames = len(video_reader)
+    duration = total_frames / fps
     
-    Format response as:
-    DETECTED ACTIONS:
-    action_code: confidence_level - justification
+    # 3. Define sliding windows
+    WINDOW_DURATION = 10  # seconds
+    WINDOW_STEP = 5       # seconds
+    windows = create_sliding_windows(
+        duration, WINDOW_DURATION, WINDOW_STEP
+    )
+    
+    # 4. Process each window
+    window_predictions = []
+    for i, (start, end) in enumerate(windows):
+        # Extract frames
+        frames = extract_frames_at_3fps(
+            video_reader, start, end
+        )
+        
+        # Run model inference
+        predictions = self.predict_window(frames)
+        
+        window_predictions.append({
+            "window_number": i,
+            "start_time": start,
+            "end_time": end,
+            "predictions": predictions
+        })
+    
+    # 5. Aggregate into 2-minute intervals
+    intervals = aggregate_to_intervals(
+        window_predictions, duration
+    )
+    
+    # 6. Save results
+    results = {
+        "video_path": video_path,
+        "video_info": {...},
+        "intervals": intervals,
+        ...
+    }
+    with open(output_json_path, 'w') as f:
+        json.dump(results, f, indent=2)
+    
+    return results
+\end{lstlisting}
+
+\subsection{predict\_window Method}
+
+\begin{lstlisting}[caption={Window-Level Prediction}]
+def predict_window(self, frames):
+    # Construct prompt for multi-label classification
+    prompt = """Analyze this classroom video segment.
+    For each behavior, respond YES or NO:
+    
+    STUDENT BEHAVIORS:
+    - Listening/taking notes (L)
+    - Individual thinking/problem solving (Ind)
+    - Clicker group discussion (CG)
+    ...
+    
+    INSTRUCTOR BEHAVIORS:
+    - Lecturing (Lec)
+    - Real-time writing (RtW)
+    - Posing questions to class (PQ)
     ...
     """
     
-    msgs = [{"role": "user", "content": frames + [prompt]}]
+    # Encode video frames
+    inputs = self.model.encode_video(
+        frames, 
+        prompt=prompt,
+        fps=3
+    )
     
-    with torch.no_grad():
-        answer = self.model.chat(
-            msgs=msgs, tokenizer=self.tokenizer,
-            temporal_ids=temporal_ids
-        )
+    # Generate predictions
+    outputs = self.model.generate(
+        **inputs,
+        max_new_tokens=500,
+        temperature=0.7
+    )
     
-    predictions = self.parse_action_classifications(answer)
-    return {"description": answer, "predictions": predictions}
+    # Parse structured output
+    predictions = parse_copus_output(outputs)
+    
+    return predictions  # Dict: action -> confidence
 \end{lstlisting}
 
-\subsection{Full Lecture Evaluation}
+\subsection{Aggregation Algorithm}
 
-\begin{lstlisting}[caption={Complete Processing Pipeline}]
-def evaluate_full_lecture(self, video_path, output_path):
-    # 1. Load video
-    vr = VideoReader(str(video_path), ctx=cpu(0))
-    fps, total_frames = vr.get_avg_fps(), len(vr)
-    duration = total_frames / fps
+\begin{lstlisting}[caption={Temporal Aggregation}]
+def aggregate_to_intervals(window_predictions, duration):
+    AGGREGATION_INTERVAL = 120  # 2 minutes
+    num_intervals = int(np.ceil(duration / AGGREGATION_INTERVAL))
     
-    # 2. Calculate sliding windows
-    num_windows = int((duration - WINDOW_DURATION) / WINDOW_STEP) + 1
-    
-    # 3. Process each window
-    window_results = []
-    for window_idx in range(num_windows):
-        start_sec = window_idx * WINDOW_STEP
-        end_sec = start_sec + WINDOW_DURATION
-        
-        # Extract frames
-        frames_array = vr.get_batch(frame_indices).asnumpy()
-        frames, temporal_ids = encode_video_window(frames_array, fps)
-        
-        # Evaluate
-        result = self.evaluate_window(frames, temporal_ids)
-        window_results.append({
-            "start_time": start_sec, "end_time": end_sec,
-            "predictions": result["predictions"]
-        })
-    
-    # 4. Aggregate into 2-minute intervals
-    intervals = self.aggregate_results(window_results, duration)
-    
-    # 5. Save results
-    output = {
-        "video_path": str(video_path),
-        "video_info": {...},
-        "intervals": intervals,
-        "timestamp": datetime.now().isoformat()
-    }
-    
-    with open(output_path, "w") as f:
-        json.dump(output, f, indent=2)
-    
-    return output
-\end{lstlisting}
-
-\subsection{Temporal Aggregation}
-
-\begin{lstlisting}[caption={Window to Interval Aggregation}]
-def aggregate_results(self, window_results, total_duration):
-    num_intervals = int(math.ceil(total_duration / 120))
     intervals = []
-    
     for i in range(num_intervals):
-        interval_start = i * 120
-        interval_end = min((i + 1) * 120, total_duration)
+        interval_start = i * AGGREGATION_INTERVAL
+        interval_end = min(
+            (i + 1) * AGGREGATION_INTERVAL, 
+            duration
+        )
         
         # Find overlapping windows
-        overlapping = [w for w in window_results 
-                      if w["start_time"] < interval_end and 
-                         w["end_time"] > interval_start]
+        overlapping = [
+            w for w in window_predictions 
+            if w["start_time"] < interval_end and 
+               w["end_time"] > interval_start
+        ]
         
-        # Aggregate confidences (max across windows)
+        # Compute max confidence per action
         action_confidences = {}
         for window in overlapping:
             for action, conf in window["predictions"].items():
@@ -548,17 +588,6 @@ def aggregate_results(self, window_results, total_duration):
 }
 \end{lstlisting}
 
-\section{Excel Output}
-
-\textbf{Structure:}
-\begin{itemize}
-    \item Row 1: Title (merged across columns)
-    \item Row 2: Headers (2-min Intervals | 1 | 2 | ... | Total | Percent)
-    \item Rows 3+: COPUS codes with binary values (0/1)
-    \item Formulas: \texttt{Total = SUM(intervals)}, \texttt{Percent = Total/NumIntervals}
-    \item Additional columns: Composite metrics (Student Talk, Instructor Guide, etc.)
-\end{itemize}
-
 \chapter{Algorithms}
 
 \section{Sliding Window}
@@ -580,7 +609,7 @@ For i = 0 to num_windows - 1:
 \begin{itemize}
     \item Duration: 3600s, Window: 10s, Step: 5s
     \item Number of windows: $(3600 - 10) / 5 + 1 = 719$
-    \item Processing time: 12-15 min (GPU), 150-180 min (CPU)
+    \item Processing time: 24-48 HR depending on GPU power. Ran on NVIDIA RTX 5080 in around 32 hours.
 \end{itemize}
 
 \section{Temporal Aggregation}
@@ -593,12 +622,283 @@ C_{action,interval} = \max_{w \in W_{overlapping}} C_{action,w}
 
 \textbf{Binary threshold:} Action marked present if $C \geq 0.5$
 
-\textbf{Rationale:} 
+
+\chapter{Getting Started with the Codebase}
+
+\section{Repository Structure}
+
+\begin{verbatim}
+copus-video-evaluation/
+|-- app/
+|   |-- copus_evaluation_app.py    # Main CLI application
+|   |-- copus_gui.py                # Tkinter GUI
+|   |-- full_lecture_evaluation.py  # Core evaluation engine
+|   |-- video_utils.py              # Video preprocessing utilities
+|   |-- requirements.txt            # Python dependencies
+|   `-- README.md                   # Setup instructions
+|-- models/
+|   |-- copus_model_best/          # Fine-tuned model checkpoint (if available)
+|   `-- download_model.sh          # Script to download base model
+|-- notebooks/
+|   |-- exploratory_analysis.ipynb # Data exploration
+|   |-- model_evaluation.ipynb     # Performance metrics
+|   `-- visualization.ipynb        # Result visualization
+|-- tests/
+|   |-- test_evaluation.py         # Unit tests for evaluator
+|   |-- test_aggregation.py        # Tests for temporal aggregation
+|   `-- sample_videos/             # Short test videos
+|-- docs/
+|   |-- technical-doc.tex          # This document
+|   |-- user_guide.pdf             # End-user documentation
+|   `-- model_training.md          # Fine-tuning procedures
+`-- scripts/
+    |-- batch_process.py           # Process multiple videos
+    |-- validate_results.py        # Compare to human coding
+    `-- export_statistics.py       # Aggregate analytics
+\end{verbatim}
+
+
+\section{Key Files and Their Purposes}
+
+\subsection{copus\_evaluation\_app.py}
+\textbf{Purpose:} Application layer and main entry point
+
+\textbf{Responsibilities:}
 \begin{itemize}
-    \item Captures actions occurring for any significant portion of interval
-    \item Aligns with human COPUS coding (mark if occurs during interval)
-    \item Reduces false negatives for brief but important activities
+    \item Command-line interface parsing
+    \item COPUS code mapping and naming
+    \item JSON to Excel conversion
+    \item Summary report generation
+    \item Orchestration of FullLectureEvaluator
 \end{itemize}
+
+\textbf{When to modify:}
+\begin{itemize}
+    \item Adding new CLI arguments
+    \item Changing output formats
+    \item Modifying Excel layout or formulas
+    \item Adding new COPUS codes (rare, protocol-dependent)
+\end{itemize}
+
+\subsection{full\_lecture\_evaluation.py}
+\textbf{Purpose:} Core evaluation logic
+
+\textbf{Responsibilities:}
+\begin{itemize}
+    \item Model loading and initialization
+    \item Video preprocessing (frame extraction, format conversion)
+    \item Sliding window generation
+    \item Window-level inference
+    \item Temporal aggregation to 2-minute intervals
+\end{itemize}
+
+\textbf{When to modify:}
+\begin{itemize}
+    \item Changing window parameters (duration, step size)
+    \item Modifying aggregation strategy
+    \item Adjusting confidence thresholds
+    \item Implementing model ensembles
+    \item Adding preprocessing steps
+\end{itemize}
+
+\subsection{copus\_gui.py}
+\textbf{Purpose:} Graphical user interface
+
+\textbf{Responsibilities:}
+\begin{itemize}
+    \item UI layout and widgets
+    \item User input validation
+    \item Progress reporting
+    \item Threaded evaluation (prevent UI freezing)
+    \item Error display and result opening
+\end{itemize}
+
+\textbf{When to modify:}
+\begin{itemize}
+    \item Improving UI/UX
+    \item Adding batch processing in GUI
+    \item Implementing result preview
+    \item Adding visualization features
+\end{itemize}
+
+\subsection{video\_utils.py}
+\textbf{Purpose:} Video preprocessing utilities
+
+\textbf{Key Functions:}
+\begin{itemize}
+    \item \texttt{convert\_mts\_to\_mp4()}: Format conversion using FFmpeg
+    \item \texttt{extract\_frames\_at\_fps()}: Frame extraction at target framerate
+    \item \texttt{get\_video\_metadata()}: Duration, resolution, codec info
+    \item \texttt{validate\_video\_file()}: Check file existence and format
+\end{itemize}
+
+\textbf{When to modify:}
+\begin{itemize}
+    \item Supporting new video formats
+    \item Optimizing frame extraction
+    \item Adding video quality checks
+    \item Implementing video downsampling
+\end{itemize}
+
+\section{Development Workflow}
+
+\subsection{Setting Up Development Environment}
+
+\begin{lstlisting}[language=bash]
+# Clone repository
+git clone <repo-url>
+cd copus-video-evaluation
+
+# Install dependencies
+cd app
+pip install -r requirements.txt
+
+# Verify installation
+python -c "import torch; print(f'CUDA: {torch.cuda.is_available()}')"
+python -c "import decord; print('Decord OK')"
+ffmpeg -version
+\end{lstlisting}
+
+\subsection{Testing Individual Components}
+
+\begin{lstlisting}
+# Test video preprocessing
+python video_utils.py --test-video tests/sample_videos/short_lecture.mp4
+
+# Test model inference on single window
+python full_lecture_evaluation.py --test-inference \
+    --video tests/sample_videos/short_lecture.mp4 \
+    --start-time 0 --end-time 10
+
+\end{lstlisting}
+
+\subsection{Code Style and Formatting}
+
+The project formats all code via. the Black Python formatter. The plugin is freely available on most IDEs, and can be manually installed via pip:
+\begin{lstlisting}[language=bash]
+pip install black
+black .
+\end{lstlisting}
+
+
+\section{Current System State and Limitations}
+
+\subsection{What Works Well}
+\begin{itemize}
+    \item \textbf{High-frequency behaviors:} Achieves 85-95\% accuracy on common actions like "Listening" and "Lecturing"
+    \item \textbf{Long videos:} Reliably processes 50-90 minute lectures without crashes
+    \item \textbf{Multiple formats:} Handles MP4, AVI, MOV, MTS without manual conversion
+    \item \textbf{Temporal consistency:} Sliding window approach provides smooth transitions
+    \item \textbf{User accessibility:} Both CLI and GUI interfaces work intuitively
+\end{itemize}
+
+\subsection{Known Limitations}
+\begin{itemize}
+    \item \textbf{Low-frequency behaviors:} Actions like "Student Presentation" (SP) or "Prediction" (Prd) have lower recall due to limited training examples
+    \item \textbf{Audio-dependent actions:} "Student Question" (SQ) detection relies heavily on visual cues (hand raising) and may miss verbal questions
+    \item \textbf{Processing speed:} This system requires 24-48 hours per full lecture on high-end GPUs. \textbf{TLDR: PC EXPLODER}
+\end{itemize}
+
+\section{Debugging and Troubleshooting}
+
+\subsection{Common Development Issues}
+
+\textbf{Issue: Video loading fails with "codec not supported"}
+\begin{itemize}
+    \item \textbf{Cause:} FFmpeg missing required codecs
+    \item \textbf{Fix:} Install full FFmpeg build (not minimal version): \texttt{sudo apt install ffmpeg libavcodec-extra}
+\end{itemize}
+
+\textbf{Issue: GPU out of memory during processing}
+\begin{itemize}
+    \item \textbf{Cause:} Batch size too large or other GPU processes
+    \item \textbf{Fix:} Reduce batch size in model config; clear GPU cache with \texttt{torch.cuda.empty\_cache()}
+    \item Consider a more powerful GPU or utilize a cluster
+\end{itemize}
+
+\textbf{Issue: Temporal aggregation produces strange patterns (should be completely resolved)}
+\begin{itemize}
+    \item \textbf{Cause:} Window timestamps miscalculated or overlapping window identification bug
+    \item \textbf{Fix:} Add logging to \texttt{aggregate\_to\_intervals()}; verify window start/end times align with intervals
+\end{itemize}
+
+\subsection{Useful Debugging Commands}
+
+\begin{lstlisting}[language=bash]
+# Enable verbose logging
+export COPUS_DEBUG=1
+python copus_evaluation_app.py lecture.mp4 --verbose
+
+# Profile model inference time
+python -m cProfile -o profile.stats full_lecture_evaluation.py
+python -c "import pstats; p = pstats.Stats('profile.stats'); \
+    p.sort_stats('cumulative').print_stats(20)"
+
+# Monitor GPU usage during processing
+watch -n 1 nvidia-smi
+
+# Check video metadata without processing
+ffprobe -show_format -show_streams lecture.mp4
+\end{lstlisting}
+
+\chapter{Future Works}
+
+\section{Improvements}
+
+\subsection{Active Learning for Low-Frequency Behaviors}
+
+\textbf{Motivation:} Rare COPUS codes (SP, Prd, TQ, D/V) have insufficient training examples, leading to poor recall.
+
+\textbf{Implementation Approach:}
+\begin{enumerate}
+    \item \textbf{Uncertainty Sampling:}
+    \begin{itemize}
+        \item Run model on large unlabeled video corpus
+        \item Identify windows where model confidence is low for rare actions (e.g., $0.3 < P(SP) < 0.6$)
+        \item Sample 200-500 uncertain windows for human annotation
+    \end{itemize}
+    
+    \item \textbf{Iterative Fine-Tuning:}
+    \begin{itemize}
+        \item Annotate selected windows (faster than full videos)
+        \item Add to training set and re-train model
+        \item Repeat 3-5 times
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Visual Saliency Maps}
+
+\textbf{Motivation:} Educators and researchers can then understand \textit{why} the model made certain predictions.
+
+\textbf{Implementation Approach:}
+\begin{itemize}
+    \item Use Grad-CAM or attention visualization to highlight regions influencing predictions
+    \item For each detected behavior, generate heatmap overlay showing attended areas
+    \item Save visualizations alongside Excel outputs
+\end{itemize}
+
+\subsection{Hierarchical Behavior Modeling}
+
+\textbf{Motivation:} Some COPUS codes have hierarchical relationships (e.g., "Group Work" subsumes CG, WG, OG).
+
+\textbf{Implementation Approach:}
+\begin{itemize}
+    \item Model predictions as tree: First predict "Group Work" vs. "Individual", then if "Group Work", predict CG/WG/OG
+\end{itemize}
+
+
+\section{Research Ideas}
+
+\subsection{Multi-Classroom Comparison}
+
+\textbf{Research Question:} What are typical COPUS profiles for effective vs. ineffective teaching?
+
+\textbf{Experimental Design:}
+\begin{enumerate}
+    \item Process videos across different instructors and courses
+    \item Correlate COPUS patterns with outcomes like exam scores, course evaluations
+    \item Build recommendation system: "Instructors with high student engagement tend to have X\% more follow-up questions"
+\end{enumerate}
 
 \chapter{Deployment}
 
@@ -606,29 +906,11 @@ C_{action,interval} = \max_{w \in W_{overlapping}} C_{action,w}
 
 \textbf{Requirements:}
 \begin{itemize}
-    \item Python 3.9-3.11
+    \item Python 3.9+
     \item CUDA 11.8+ (for GPU)
     \item FFmpeg 4.0+
     \item 32GB+ RAM, 16GB+ VRAM (recommended)
 \end{itemize}
-
-\textbf{Setup:}
-\begin{lstlisting}[language=bash]
-# Create environment
-python3 -m venv venv
-source venv/bin/activate
-
-# Install PyTorch
-pip install torch==2.0.0+cu118 -f \
-  https://download.pytorch.org/whl/torch_stable.html
-
-# Install dependencies
-cd app && pip install -r requirements.txt
-
-# Verify
-python -c "import torch; print(torch.cuda.is_available())"
-ffmpeg -version
-\end{lstlisting}
 
 \section{Usage Examples}
 

@@ -1,34 +1,65 @@
-\contentsline {chapter}{\numberline {1}System Overview}{3}{chapter.1}%
-\contentsline {section}{\numberline {1.1}Introduction}{3}{section.1.1}%
-\contentsline {section}{\numberline {1.2}COPUS Protocol}{3}{section.1.2}%
-\contentsline {chapter}{\numberline {2}Application Layer}{4}{chapter.2}%
-\contentsline {section}{\numberline {2.1}copus\_evaluation\_app.py}{4}{section.2.1}%
-\contentsline {subsection}{\numberline {2.1.1}Class: COPUSEvaluationApp}{4}{subsection.2.1.1}%
-\contentsline {subsection}{\numberline {2.1.2}evaluate\_video Method}{4}{subsection.2.1.2}%
-\contentsline {subsection}{\numberline {2.1.3}Excel Conversion}{5}{subsection.2.1.3}%
-\contentsline {subsection}{\numberline {2.1.4}CLI Interface}{6}{subsection.2.1.4}%
-\contentsline {section}{\numberline {2.2}copus\_gui.py}{6}{section.2.2}%
-\contentsline {subsection}{\numberline {2.2.1}Class: COPUSEvaluationGUI}{6}{subsection.2.2.1}%
-\contentsline {subsection}{\numberline {2.2.2}Key Features}{6}{subsection.2.2.2}%
-\contentsline {chapter}{\numberline {3}Core Evaluation Engine}{8}{chapter.3}%
-\contentsline {section}{\numberline {3.1}full\_lecture\_evaluation.py}{8}{section.3.1}%
-\contentsline {subsection}{\numberline {3.1.1}Constants}{8}{subsection.3.1.1}%
-\contentsline {subsection}{\numberline {3.1.2}Action Definitions}{8}{subsection.3.1.2}%
-\contentsline {subsection}{\numberline {3.1.3}Class: FullLectureEvaluator}{8}{subsection.3.1.3}%
-\contentsline {subsection}{\numberline {3.1.4}Window Evaluation}{9}{subsection.3.1.4}%
-\contentsline {subsection}{\numberline {3.1.5}Full Lecture Evaluation}{9}{subsection.3.1.5}%
-\contentsline {subsection}{\numberline {3.1.6}Temporal Aggregation}{10}{subsection.3.1.6}%
-\contentsline {chapter}{\numberline {4}Data Formats}{12}{chapter.4}%
-\contentsline {section}{\numberline {4.1}JSON Output}{12}{section.4.1}%
-\contentsline {section}{\numberline {4.2}Excel Output}{12}{section.4.2}%
-\contentsline {chapter}{\numberline {5}Algorithms}{14}{chapter.5}%
-\contentsline {section}{\numberline {5.1}Sliding Window}{14}{section.5.1}%
-\contentsline {section}{\numberline {5.2}Temporal Aggregation}{14}{section.5.2}%
-\contentsline {chapter}{\numberline {6}Deployment}{15}{chapter.6}%
-\contentsline {section}{\numberline {6.1}Installation}{15}{section.6.1}%
-\contentsline {section}{\numberline {6.2}Usage Examples}{15}{section.6.2}%
-\contentsline {chapter}{\numberline {7}Troubleshooting}{16}{chapter.7}%
-\contentsline {section}{\numberline {7.1}Common Issues}{16}{section.7.1}%
-\contentsline {section}{\numberline {7.2}FAQ}{16}{section.7.2}%
-\contentsline {chapter}{\numberline {A}COPUS Code Reference}{18}{appendix.A}%
-\contentsline {chapter}{\numberline {B}Model Architecture}{19}{appendix.B}%
+\contentsline {chapter}{\numberline {1}Background and Prerequisites}{3}{chapter.1}%
+\contentsline {section}{\numberline {1.1}Understanding the Problem}{3}{section.1.1}%
+\contentsline {subsection}{\numberline {1.1.1}The COPUS Protocol}{3}{subsection.1.1.1}%
+\contentsline {subsection}{\numberline {1.1.2}Challenges}{3}{subsection.1.1.2}%
+\contentsline {subsection}{\numberline {1.1.3}Sliding Window Approach}{3}{subsection.1.1.3}%
+\contentsline {subsection}{\numberline {1.1.4}Temporal Aggregation}{4}{subsection.1.1.4}%
+\contentsline {section}{\numberline {1.2}Technical Prerequisites}{4}{section.1.2}%
+\contentsline {subsection}{\numberline {1.2.1}Python and ML Libraries}{4}{subsection.1.2.1}%
+\contentsline {subsection}{\numberline {1.2.2}Video Processing}{4}{subsection.1.2.2}%
+\contentsline {subsection}{\numberline {1.2.3}Input/Output Formats}{4}{subsection.1.2.3}%
+\contentsline {chapter}{\numberline {2}System Overview}{5}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Introduction}{5}{section.2.1}%
+\contentsline {section}{\numberline {2.2}COPUS Protocol}{5}{section.2.2}%
+\contentsline {chapter}{\numberline {3}Application Layer}{6}{chapter.3}%
+\contentsline {section}{\numberline {3.1}copus\_evaluation\_app.py}{6}{section.3.1}%
+\contentsline {subsection}{\numberline {3.1.1}Class: COPUSEvaluationApp}{6}{subsection.3.1.1}%
+\contentsline {subsection}{\numberline {3.1.2}evaluate\_video Method}{6}{subsection.3.1.2}%
+\contentsline {subsection}{\numberline {3.1.3}Excel Conversion}{7}{subsection.3.1.3}%
+\contentsline {subsection}{\numberline {3.1.4}CLI Interface}{8}{subsection.3.1.4}%
+\contentsline {section}{\numberline {3.2}copus\_gui.py}{8}{section.3.2}%
+\contentsline {subsection}{\numberline {3.2.1}Class: COPUSEvaluationGUI}{8}{subsection.3.2.1}%
+\contentsline {section}{\numberline {3.3}Python API Usage}{8}{section.3.3}%
+\contentsline {chapter}{\numberline {4}Core Evaluation Engine}{10}{chapter.4}%
+\contentsline {section}{\numberline {4.1}full\_lecture\_evaluation.py}{10}{section.4.1}%
+\contentsline {subsection}{\numberline {4.1.1}Class: FullLectureEvaluator}{10}{subsection.4.1.1}%
+\contentsline {subsection}{\numberline {4.1.2}evaluate\_full\_lecture Method}{10}{subsection.4.1.2}%
+\contentsline {subsection}{\numberline {4.1.3}predict\_window Method}{11}{subsection.4.1.3}%
+\contentsline {subsection}{\numberline {4.1.4}Aggregation Algorithm}{12}{subsection.4.1.4}%
+\contentsline {chapter}{\numberline {5}Data Formats}{13}{chapter.5}%
+\contentsline {section}{\numberline {5.1}JSON Output}{13}{section.5.1}%
+\contentsline {chapter}{\numberline {6}Algorithms}{14}{chapter.6}%
+\contentsline {section}{\numberline {6.1}Sliding Window}{14}{section.6.1}%
+\contentsline {section}{\numberline {6.2}Temporal Aggregation}{14}{section.6.2}%
+\contentsline {chapter}{\numberline {7}Getting Started with the Codebase}{15}{chapter.7}%
+\contentsline {section}{\numberline {7.1}Repository Structure}{15}{section.7.1}%
+\contentsline {section}{\numberline {7.2}Key Files and Their Purposes}{16}{section.7.2}%
+\contentsline {subsection}{\numberline {7.2.1}copus\_evaluation\_app.py}{16}{subsection.7.2.1}%
+\contentsline {subsection}{\numberline {7.2.2}full\_lecture\_evaluation.py}{16}{subsection.7.2.2}%
+\contentsline {subsection}{\numberline {7.2.3}copus\_gui.py}{17}{subsection.7.2.3}%
+\contentsline {subsection}{\numberline {7.2.4}video\_utils.py}{17}{subsection.7.2.4}%
+\contentsline {section}{\numberline {7.3}Development Workflow}{18}{section.7.3}%
+\contentsline {subsection}{\numberline {7.3.1}Setting Up Development Environment}{18}{subsection.7.3.1}%
+\contentsline {subsection}{\numberline {7.3.2}Testing Individual Components}{18}{subsection.7.3.2}%
+\contentsline {subsection}{\numberline {7.3.3}Code Style and Formatting}{18}{subsection.7.3.3}%
+\contentsline {section}{\numberline {7.4}Current System State and Limitations}{18}{section.7.4}%
+\contentsline {subsection}{\numberline {7.4.1}What Works Well}{18}{subsection.7.4.1}%
+\contentsline {subsection}{\numberline {7.4.2}Known Limitations}{18}{subsection.7.4.2}%
+\contentsline {section}{\numberline {7.5}Debugging and Troubleshooting}{19}{section.7.5}%
+\contentsline {subsection}{\numberline {7.5.1}Common Development Issues}{19}{subsection.7.5.1}%
+\contentsline {subsection}{\numberline {7.5.2}Useful Debugging Commands}{19}{subsection.7.5.2}%
+\contentsline {chapter}{\numberline {8}Future Works}{20}{chapter.8}%
+\contentsline {section}{\numberline {8.1}Improvements}{20}{section.8.1}%
+\contentsline {subsection}{\numberline {8.1.1}Active Learning for Low-Frequency Behaviors}{20}{subsection.8.1.1}%
+\contentsline {subsection}{\numberline {8.1.2}Visual Saliency Maps}{20}{subsection.8.1.2}%
+\contentsline {subsection}{\numberline {8.1.3}Hierarchical Behavior Modeling}{20}{subsection.8.1.3}%
+\contentsline {section}{\numberline {8.2}Research Ideas}{21}{section.8.2}%
+\contentsline {subsection}{\numberline {8.2.1}Multi-Classroom Comparison}{21}{subsection.8.2.1}%
+\contentsline {chapter}{\numberline {9}Deployment}{22}{chapter.9}%
+\contentsline {section}{\numberline {9.1}Installation}{22}{section.9.1}%
+\contentsline {section}{\numberline {9.2}Usage Examples}{22}{section.9.2}%
+\contentsline {chapter}{\numberline {10}Troubleshooting}{23}{chapter.10}%
+\contentsline {section}{\numberline {10.1}Common Issues}{23}{section.10.1}%
+\contentsline {section}{\numberline {10.2}FAQ}{23}{section.10.2}%
+\contentsline {chapter}{\numberline {A}COPUS Code Reference}{25}{appendix.A}%
+\contentsline {chapter}{\numberline {B}Model Architecture}{26}{appendix.B}%
