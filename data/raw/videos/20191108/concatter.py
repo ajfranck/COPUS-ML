@@ -6,7 +6,7 @@ def concatenate_videos_ffmpeg():
     script_dir = os.path.dirname(os.path.abspath(__file__))
     
     files = os.listdir(script_dir)
-    video_extensions = ('.mp4', '.avi', '.mov', '.mkv', '.flv', '.wmv')
+    video_extensions = ('.mp4', '.avi', '.mov', '.mkv', '.flv', '.wmv', '.mts', '.MTS')
     video_files = [f for f in files if f.lower().endswith(video_extensions)]
     
     def get_number(filename):
@@ -29,7 +29,7 @@ def concatenate_videos_ffmpeg():
             f.write(f"file '{full_path}'\n")
     
     print("Concatting") 
-    output_path = os.path.join(script_dir, 'concatenated_output.mp4')
+    output_path = os.path.join(script_dir, 'concatenated_output.MTS')
     subprocess.run([
         'ffmpeg', '-f', 'concat', '-safe', '0', 
         '-i', filelist_path, '-c', 'copy', 
