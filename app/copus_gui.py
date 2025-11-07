@@ -27,7 +27,7 @@ class COPUSEvaluationGUI:
 
         self.video_path = tk.StringVar()
         self.output_dir = tk.StringVar(value="copus_results")
-        self.model_checkpoint = tk.StringVar()
+        self.hf_model_repo = tk.StringVar(value="ajfranck/COPUS-analysis") 
         self.device = tk.StringVar(value="cuda")
         self.processing = False
 
@@ -103,18 +103,23 @@ class COPUSEvaluationGUI:
         optional_frame.grid(row=4, column=0, columnspan=3, sticky=(tk.W, tk.E), pady=10)
         optional_frame.columnconfigure(1, weight=1)
 
-        ttk.Label(optional_frame, text="Model Checkpoint:").grid(
+        ttk.Label(optional_frame, text="HuggingFace Model:").grid(
             row=0, column=0, sticky=tk.W, pady=5
         )
-        ttk.Entry(optional_frame, textvariable=self.model_checkpoint, width=60).grid(
-            row=0, column=1, sticky=(tk.W, tk.E), pady=5
+        hf_entry = ttk.Entry(optional_frame, textvariable=self.hf_model_repo, width=60)
+        hf_entry.grid(row=0, column=1, columnspan=2, sticky=(tk.W, tk.E), pady=5)
+        
+        # Add help text
+        help_text = ttk.Label(
+            optional_frame, 
+            text="Enter your HuggingFace model repo (e.g., username/copus-model) or leave default",
+            font=("Arial", 8),
+            foreground="gray"
         )
-        ttk.Button(
-            optional_frame, text="Browse...", command=self.browse_checkpoint
-        ).grid(row=0, column=2, padx=(5, 0), pady=5)
+        help_text.grid(row=0, column=1, columnspan=2, sticky=tk.W, pady=(30, 0))
 
         ttk.Label(optional_frame, text="Processing Device:").grid(
-            row=1, column=0, sticky=tk.W, pady=5
+            row=1, column=0, sticky=tk.W, pady=(15, 5)
         )
         device_frame = ttk.Frame(optional_frame)
         device_frame.grid(row=1, column=1, sticky=tk.W, pady=5)
@@ -194,13 +199,6 @@ class COPUSEvaluationGUI:
             self.output_dir.set(dirname)
             self.log(f"Output directory: {dirname}")
 
-    def browse_checkpoint(self):
-        """Browse for model checkpoint"""
-        dirname = filedialog.askdirectory(title="Select Model Checkpoint Directory")
-        if dirname:
-            self.model_checkpoint.set(dirname)
-            self.log(f"Model checkpoint: {dirname}")
-
     def log(self, message):
         timestamp = datetime.now().strftime("%H:%M:%S")
         self.log_text.insert(tk.END, f"[{timestamp}] {message}\n")
@@ -237,20 +235,22 @@ class COPUSEvaluationGUI:
         try:
             video_file = self.video_path.get()
             output_dir = self.output_dir.get()
-            checkpoint = (
-                self.model_checkpoint.get() if self.model_checkpoint.get() else None
-            )
+            hf_repo = self.hf_model_repo.get().strip()
             device = self.device.get()
 
             self.log(f"Video: {Path(video_file).name}")
             self.log(f"Output directory: {output_dir}")
             self.log(f"Device: {device}")
-            if checkpoint:
-                self.log(f"Using checkpoint: {checkpoint}")
+            if hf_repo and hf_repo != "your-username/copus-ml":
+                self.log(f"HuggingFace model: {hf_repo}")
+            else:
+                self.log("Using base model (no fine-tuned model specified)")
             self.log("")
 
-            self.log("Initializing evaluator.")
-            app = COPUSEvaluationApp(model_checkpoint=checkpoint, device=device)
+            self.log("Initializing evaluator...")
+            # Only pass hf_model_repo if it's been customized
+            hf_model = hf_repo if (hf_repo and hf_repo != "your-username/copus-ml") else None
+            app = COPUSEvaluationApp(hf_model_repo=hf_model, device=device)
 
             import logging
 
