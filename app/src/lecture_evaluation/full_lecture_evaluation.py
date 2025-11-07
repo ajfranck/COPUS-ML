@@ -204,7 +204,7 @@ class FullLectureEvaluator:
             logger.info(f"Loading base model: {base_model}")
             self.model = AutoModel.from_pretrained(
                 base_model,
-                device_map="auto",
+                # device_map="auto",
                 trust_remote_code=True,
                 attn_implementation="sdpa",
                 torch_dtype=torch.bfloat16,
