@@ -183,7 +183,7 @@ class COPUSClassifier(nn.Module):
 
 
 class COPUSTrainer:
-    """Production trainer with classifier head"""
+    """Production trainer using model's built-in vision processing"""
     
     def __init__(
         self,
@@ -194,7 +194,7 @@ class COPUSTrainer:
         self.device = device if torch.cuda.is_available() else 'cpu'
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(parents=True, exist_ok=True)
-        self.hf_repo_id = "ajfranck/COPUS-analysis"  # Hardcoded - uploads automatically
+        self.hf_repo_id = "ajfranck/COPUS-analysis"
         
         logger.info(f"Device: {self.device}")
         logger.info(f"Loading base model: {base_model}")
@@ -211,7 +211,7 @@ class COPUSTrainer:
         for param in self.vl_model.parameters():
             param.requires_grad = False
         
-        logger.info("Vision-language model loaded and frozen")
+        logger.info("  Vision-language model loaded and frozen")
         
         hidden_size = getattr(self.vl_model.config, 'hidden_size', 4096)
         self.classifier = COPUSClassifier(
@@ -219,96 +219,105 @@ class COPUSTrainer:
             num_classes=len(COPUS_ACTIONS)
         ).to(self.device)
         
-        logger.info(f"Classifier initialized (input: {hidden_size}, output: {len(COPUS_ACTIONS)})")
+        logger.info(f"  Classifier initialized (input: {hidden_size}, output: {len(COPUS_ACTIONS)})")
         
         self.criterion = nn.BCEWithLogitsLoss()
     
     def extract_features(self, frames: List[Image.Image], temporal_ids: List) -> torch.Tensor:
-        """Extract features from frozen vision-language model"""
+        """
+        Extract features using model.chat() with the SAME prompt as evaluation
+        Uses all frames to maintain consistency with evaluation pipeline
+        """
         with torch.no_grad():
             try:
-                # Format data according to MiniCPM-V official API
-                msgs = [{"role": "user", "content": frames + ["Describe the classroom activity."]}]
+                if not frames:
+                    logger.warning("No frames provided")
+                    return torch.randn(1, 4096, dtype=torch.float32).to(self.device)
                 
-                if hasattr(self.vl_model, 'resampler') and hasattr(self.vl_model, 'vpm'):
-                    try:
-                        # Process images through vision encoder
-                        from torchvision import transforms
-                        transform = transforms.Compose([
-                            transforms.ToTensor(),
-                            transforms.Normalize(mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5))
-                        ])
-                        
-                        # Convert frames to tensor
-                        frame_tensors = torch.stack([transform(f) for f in frames]).to(self.device)
-                        
-                        # Get vision features
-                        vision_outputs = self.vl_model.vpm(frame_tensors)
-                        
-                        if hasattr(vision_outputs, 'last_hidden_state'):
-                            vision_features = vision_outputs.last_hidden_state
-                        else:
-                            vision_features = vision_outputs
-                        
-                        if hasattr(self.vl_model, 'resampler'):
-                            if len(vision_features.shape) == 4:  # [batch, channels, h, w]
-                                b, c, h, w = vision_features.shape
-                                vision_features = vision_features.flatten(2).transpose(1, 2)
-                            
-                            resampled = self.vl_model.resampler(vision_features)
-                            features = resampled.mean(dim=1)  # [batch, hidden_dim]
-                        else:
-                            # No resampler, just pool the vision features
-                            if len(vision_features.shape) == 4:
-                                features = vision_features.mean(dim=[2, 3])  # Pool spatial dims
-                            else:
-                                features = vision_features.mean(dim=1)  # Pool sequence dim
-                        
-                        features = features.mean(dim=0, keepdim=True)  # [1, hidden_dim]
-                        return features
-                        
-                    except Exception as e:
-                        logger.warning(f"Direct vision encoding failed: {e}, trying full model approach")
+                # Build COPUS actions list for prompt (same as evaluation)
+                copus_actions_list = "\n".join([
+                    f"- {key}: {value}" 
+                    for key, value in COPUS_LABELS.items()
+                ])
                 
-                #  Use full model forward pass with hidden states
-                outputs = self.vl_model(
-                    data=msgs,
+                # Use EXACT same prompt as evaluation script
+                classification_prompt = f"""Analyze this classroom video and identify ALL COPUS actions that are currently occurring.
+        COPUS Actions to identify:
+        {copus_actions_list}
+        Instructions:
+        1. Watch the video segment carefully
+        2. Identify ALL actions that are happening (there can be multiple simultaneous actions)
+        3. For each action you identify, provide:
+        - The exact action code from the list above
+        - Your confidence level (high, medium, or low)
+        - A brief justification
+        Format your response as:
+        DETECTED ACTIONS:
+        [action_code_1]: [confidence_level] - [brief justification]
+        [action_code_2]: [confidence_level] - [brief justification]
+        ...
+        Example:
+        DETECTED ACTIONS:
+        instructor_lecturing: high - The instructor is standing at the board explaining concepts
+        student_listening: high - Students are sitting and watching the instructor
+        student_individual_thinking: medium - Some students appear to be working on problems individually
+        Be thorough and identify ALL observable actions. Multiple actions often occur simultaneously."""
+                
+                # Use ALL frames (just like evaluation)
+                logger.info(f"Processing {len(frames)} frames with classification prompt")
+                
+                msgs = [{"role": "user", "content": frames + [classification_prompt]}]
+                
+                # Call model with same settings as evaluation
+                response = self.vl_model.chat(
+                    msgs=msgs,
                     tokenizer=self.tokenizer,
-                    use_cache=False,
-                    output_hidden_states=True
+                    max_new_tokens=500,  # Longer response for detailed analysis
+                    sampling=False,
+                    use_image_id=False,
+                    max_slice_nums=1,  # Keep slicing minimal to avoid OOM
                 )
                 
-                if hasattr(self.vl_model, 'resampler') and hasattr(outputs, 'vision_hidden_states'):
-                    vision_features = outputs.vision_hidden_states[-1]  # Last layer
-                    # Pool over sequence dimension
-                    features = vision_features.mean(dim=1)  # [batch, hidden_dim]
-                elif hasattr(outputs, 'hidden_states') and outputs.hidden_states is not None:
-                    # Use the last hidden state
-                    last_hidden = outputs.hidden_states[-1]
-                    # Pool over sequence dimension to get [1, hidden_dim]
-                    features = last_hidden.mean(dim=1)
+                logger.info(f"✓ Model processed {len(frames)} frames successfully")
+                logger.info(f"  Response preview: {response[:150]}...")
+                
+                # Extract embeddings from the response
+                # The model has processed all images to generate this response
+                tokens = self.tokenizer(
+                    response,
+                    return_tensors='pt',
+                    max_length=512,  # Longer for detailed response
+                    truncation=True,
+                    padding=True
+                )
+                
+                input_ids = tokens['input_ids'].to(self.device)
+                
+                # Get embeddings from LLM's embedding layer
+                if hasattr(self.vl_model, 'llm'):
+                    embed_layer = self.vl_model.llm.get_input_embeddings()
+                    embeddings = embed_layer(input_ids)  # [1, seq_len, hidden_dim]
+                    
+                    # Average pool over sequence dimension
+                    features = embeddings.mean(dim=1)  # [1, hidden_dim]
+                    
+                    # Convert to float32 to match classifier dtype
+                    features = features.float()
+                    
+                    logger.info(f"✓ Extracted features: {features.shape}")
+                    return features
                 else:
-                    if hasattr(outputs, 'logits'):
-                        logits = outputs.logits
-                        # Pool over sequence and vocab dimensions
-                        features = logits.mean(dim=[1, 2]) if len(logits.shape) > 2 else logits.mean(dim=1)
-                        # Project to expected dimension if needed
-                        if features.shape[-1] != 4096:
-                            features = torch.nn.functional.adaptive_avg_pool1d(
-                                features.unsqueeze(1), 4096
-                            ).squeeze(1)
-                    else:
-                        # Last resort we are cooked chat
-                        logger.warning("Could not extract features, using random embedding")
-                        features = torch.randn(1, 4096).to(self.device)
-                
-                return features
-                
+                    logger.warning("Could not access LLM embeddings")
+                    return torch.randn(1, 4096, dtype=torch.float32).to(self.device)
+            
             except Exception as e:
-                logger.error(f"Error extracting features: {e}")
+                logger.error(f"Feature extraction failed: {e}")
                 import traceback
                 traceback.print_exc()
-                return torch.randn(1, 4096).to(self.device)
+                
+                # Fallback to random
+                logger.warning("Using random embedding fallback")
+                return torch.randn(1, 4096, dtype=torch.float32).to(self.device)
     
     def train(
         self,
@@ -320,9 +329,9 @@ class COPUSTrainer:
         save_every: int = 2
     ):
         """Train classifier head"""
-        logger.info("-" * 60)
-        logger.info("Starting training (classifier head approach)")
-        logger.info("-" * 60)
+        logger.info("=" * 60)
+        logger.info("Starting Training (Classifier Head Approach)")
+        logger.info("=" * 60)
         logger.info(f"Training samples: {len(train_dataset)}")
         logger.info(f"Epochs: {epochs}, Batch size: {batch_size}, LR: {learning_rate}")
         
@@ -347,7 +356,7 @@ class COPUSTrainer:
         best_val_loss = float('inf')
         
         for epoch in range(epochs):
-            logger.info(f"Epoch {epoch + 1}/{epochs}")
+            logger.info(f"\n{'='*60}\nEpoch {epoch + 1}/{epochs}\n{'='*60}")
             
             # Training
             self.classifier.train()
@@ -374,234 +383,100 @@ class COPUSTrainer:
                     try:
                         features = self.extract_features(frames, temporal_ids)
                         
+                        # Convert to float32 to match classifier dtype
+                        features = features.float()
+                        
                         logits = self.classifier(features)
                         
                         loss = self.criterion(logits.squeeze(), labels)
+                        
                         loss.backward()
                         
-                        predictions = torch.sigmoid(logits.squeeze()) > 0.5
-                        correct = (predictions == labels).sum().item()
-                        total = labels.numel()
-                        
                         batch_loss += loss.item()
-                        batch_correct += correct
-                        batch_total += total
-                    
+                        
+                        preds = (torch.sigmoid(logits.squeeze()) > 0.5).float()
+                        batch_correct += (preds == labels).float().sum().item()
+                        batch_total += labels.numel()
+                        
                     except Exception as e:
-                        logger.error(f"Error processing sample: {e}")
+                        logger.error(f"Error in training step: {e}")
                         continue
                 
+                torch.nn.utils.clip_grad_norm_(self.classifier.parameters(), 1.0)
+                optimizer.step()
+                
                 if batch_total > 0:
-                    optimizer.step()
                     train_loss += batch_loss
                     train_correct += batch_correct
                     train_total += batch_total
                     
-                    progress.set_postfix({
-                        'loss': f'{batch_loss / len(batch):.4f}',
-                        'acc': f'{100 * batch_correct / batch_total:.1f}%'
-                    })
+                    avg_loss = train_loss / max(1, progress.n)
+                    avg_acc = (train_correct / train_total * 100) if train_total > 0 else 0
+                    progress.set_postfix({'loss': f'{avg_loss:.4f}', 'acc': f'{avg_acc:.1f}%'})
             
-            avg_train_loss = train_loss / max(len(train_loader), 1)
-            train_acc = 100 * train_correct / max(train_total, 1)
-            logger.info(f"Train loss: {avg_train_loss:.4f}, Accuracy: {train_acc:.2f}%")
+            epoch_loss = train_loss / max(1, len(train_loader))
+            epoch_acc = train_correct / max(1, train_total) * 100
             
-            if val_dataset:
-                val_loss, val_acc = self.validate(val_dataset)
-                logger.info(f"Val loss: {val_loss:.4f}, Accuracy: {val_acc:.2f}%")
-                
-                scheduler.step(val_loss)
-                
-                if val_loss < best_val_loss:
-                    best_val_loss = val_loss
-                    logger.info("New best validation loss")
-                    self.save_checkpoint(f"best_model", epoch + 1, val_loss)
+            logger.info(f"Epoch {epoch+1} - Loss: {epoch_loss:.4f}, Acc: {epoch_acc:.2f}%")
             
+            scheduler.step(epoch_loss)
+            
+            # Save checkpoint
             if (epoch + 1) % save_every == 0:
-                self.save_checkpoint(f"epoch_{epoch + 1}", epoch + 1, avg_train_loss)
-        
-        logger.info("-" * 60)
-        logger.info("Training complete")
-        logger.info("-" * 60)
-        
-        final_name = f"final_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
-        self.save_checkpoint(final_name, epochs, avg_train_loss)
-        self.upload_to_hub(final_name)
-    
-    def validate(self, val_dataset: COPUSDataset):
-        """Validation"""
-        self.classifier.eval()
-        
-        val_loader = DataLoader(
-            val_dataset, batch_size=1, shuffle=False,
-            num_workers=0, collate_fn=lambda x: x
-        )
-        
-        total_loss = 0.0
-        total_correct = 0
-        total_samples = 0
-        
-        with torch.no_grad():
-            for batch in tqdm(val_loader, desc="Validation"):
-                for sample in batch:
-                    frames = sample['frames']
-                    temporal_ids = sample['temporal_ids']
-                    labels = sample['labels'].to(self.device)
-                    
-                    if not frames:
-                        continue
-                    
-                    try:
-                        features = self.extract_features(frames, temporal_ids)
-                        logits = self.classifier(features)
-                        loss = self.criterion(logits.squeeze(), labels)
-                        
-                        predictions = torch.sigmoid(logits.squeeze()) > 0.5
-                        correct = (predictions == labels).sum().item()
-                        
-                        total_loss += loss.item()
-                        total_correct += correct
-                        total_samples += labels.numel()
-                    
-                    except Exception as e:
-                        logger.error(f"Validation error: {e}")
-                        continue
-        
-        self.classifier.train()
-        
-        avg_loss = total_loss / max(len(val_loader), 1)
-        accuracy = 100 * total_correct / max(total_samples, 1)
-        
-        return avg_loss, accuracy
-    
-    def save_checkpoint(self, name: str, epoch: int, loss: float):
-        """Save checkpoint"""
-        checkpoint_dir = self.output_dir / name
-        checkpoint_dir.mkdir(parents=True, exist_ok=True)
-        
-        logger.info(f"Saving checkpoint: {checkpoint_dir}")
-        
-        # Save classifier
-        torch.save({
-            'epoch': epoch,
-            'model_state_dict': self.classifier.state_dict(),
-            'loss': loss,
-            'timestamp': datetime.now().isoformat()
-        }, checkpoint_dir / 'classifier.pt')
-        
-        # Save base model info
-        with open(checkpoint_dir / 'config.json', 'w') as f:
-            json.dump({
-                'base_model': 'openbmb/MiniCPM-V-4_5',
-                'num_classes': len(COPUS_ACTIONS),
-                'epoch': epoch,
-                'loss': loss
-            }, f, indent=2)
-        
-        logger.info("Checkpoint saved")
-    
-    def upload_to_hub(self, checkpoint_name: str):
-        hf_token = os.getenv("HF_TOKEN")
-        if not hf_token:
-            logger.warning("No HF_TOKEN found. Skipping upload")
-            return
-        
-        try:
-            checkpoint_dir = self.output_dir / checkpoint_name
-            
-            if not checkpoint_dir.exists():
-                logger.error(f"Checkpoint directory not found: {checkpoint_dir}")
-                return
-            
-            readme = f"""# COPUS Classifier
-
-Classifier head for COPUS action recognition, trained on MiniCPM-V-4_5 features.
-
-## Usage
-
-```python
-# Load classifier
-classifier = torch.load('classifier.pt')
-
-# Extract features from video
-features = extract_features(frames, temporal_ids)
-
-# Predict
-logits = classifier(features)
-predictions = torch.sigmoid(logits) > 0.5
-```
-
-## Actions: {len(COPUS_ACTIONS)}
-
-Trained on: {datetime.now().strftime('%Y-%m-%d')}
-"""
-            with open(checkpoint_dir / 'README.md', 'w') as f:
-                f.write(readme)
-            
-            logger.info(f"Uploading to HuggingFace: {self.hf_repo_id}")
-            
-            api = HfApi(token=hf_token)
-            api.upload_folder(
-                folder_path=str(checkpoint_dir),
-                repo_id=self.hf_repo_id,
-                repo_type="model",
-            )
-            
-            logger.info(f"Uploaded to HuggingFace: {self.hf_repo_id}")
-        
-        except Exception as e:
-            logger.error(f"Upload failed: {e}")
-            logger.info("Model saved locally but not uploaded")
+                checkpoint_dir = self.output_dir / f'checkpoint_epoch_{epoch+1}'
+                checkpoint_dir.mkdir(exist_ok=True)
+                
+                classifier_path = checkpoint_dir / 'classifier.pt'
+                torch.save({
+                    'epoch': epoch + 1,
+                    'classifier_state_dict': self.classifier.state_dict(),
+                    'optimizer_state_dict': optimizer.state_dict(),
+                    'loss': epoch_loss,
+                    'accuracy': epoch_acc
+                }, classifier_path)
+                
+                logger.info(f"Checkpoint saved: {checkpoint_dir}")
+                
+                # Upload to HuggingFace
+                try:
+                    hf_token = os.getenv("HF_TOKEN")
+                    if hf_token:
+                        api = HfApi(token=hf_token)
+                        api.upload_file(
+                            path_or_fileobj=str(classifier_path),
+                            path_in_repo="classifier.pt",
+                            repo_id=self.hf_repo_id,
+                            repo_type="model"
+                        )
+                        logger.info(f"✓ Uploaded to HuggingFace: {self.hf_repo_id}")
+                except Exception as e:
+                    logger.warning(f"Could not upload to HuggingFace: {e}")
 
 
 def main():
     import argparse
-    
-    parser = argparse.ArgumentParser(description="Train COPUS classifier (production)")
-    parser.add_argument('--train-dir', required=True, help='Training videos directory')
-    parser.add_argument('--train-labels', required=True, help='Training labels JSON')
-    parser.add_argument('--val-dir', help='Validation videos directory')
-    parser.add_argument('--val-labels', help='Validation labels JSON')
-    parser.add_argument('--output-dir', default='models/copus_production')
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--train-dir', type=str, required=True)
+    parser.add_argument('--train-labels', type=str, required=True)
+    parser.add_argument('--output-dir', type=str, default='models/copus_production')
     parser.add_argument('--epochs', type=int, default=10)
     parser.add_argument('--batch-size', type=int, default=4)
     parser.add_argument('--learning-rate', type=float, default=1e-4)
-    parser.add_argument('--device', default='cuda')
-    
     args = parser.parse_args()
     
-    if not Path(args.train_dir).exists():
-        logger.error(f"Training dir not found: {args.train_dir}")
-        sys.exit(1)
-    
-    if not Path(args.train_labels).exists():
-        logger.error(f"Labels file not found: {args.train_labels}")
-        sys.exit(1)
-    
-    logger.info("Loading datasets...")
     train_dataset = COPUSDataset(args.train_dir, args.train_labels)
     
-    val_dataset = None
-    if args.val_dir and args.val_labels:
-        if Path(args.val_dir).exists() and Path(args.val_labels).exists():
-            val_dataset = COPUSDataset(args.val_dir, args.val_labels)
-    
-    trainer = COPUSTrainer(
-        output_dir=args.output_dir,
-        device=args.device
-    )
+    trainer = COPUSTrainer(output_dir=args.output_dir)
     
     trainer.train(
         train_dataset=train_dataset,
-        val_dataset=val_dataset,
         epochs=args.epochs,
         batch_size=args.batch_size,
         learning_rate=args.learning_rate
     )
-    
-    logger.info(f"Output: {args.output_dir}")
+
 
 if __name__ == "__main__":
     main()
 
-# python copus_training_main.py --train-dir ../../data/processed/training --train-labels ../../data/processed/training/training_labels.json --epochs 10
+# python copus_training_main.py --train-dir ../../data/processed/training --train-labels ../../data/processed/training/training_labels.json --epochs 10 --batch-size 4
