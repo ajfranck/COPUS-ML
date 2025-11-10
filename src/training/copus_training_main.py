@@ -448,7 +448,7 @@ class COPUSTrainer:
                             repo_id=self.hf_repo_id,
                             repo_type="model"
                         )
-                        logger.info(f"✓ Uploaded to HuggingFace: {self.hf_repo_id}")
+                        logger.info(f"Uploaded to HuggingFace: {self.hf_repo_id}")
                 except Exception as e:
                     logger.warning(f"Could not upload to HuggingFace: {e}")
 
