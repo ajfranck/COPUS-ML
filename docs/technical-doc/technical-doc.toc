@@ -6,8 +6,7 @@
 \contentsline {subsection}{\numberline {1.1.4}Temporal Aggregation}{4}{subsection.1.1.4}%
 \contentsline {section}{\numberline {1.2}Technical Prerequisites}{4}{section.1.2}%
 \contentsline {subsection}{\numberline {1.2.1}Python and ML Libraries}{4}{subsection.1.2.1}%
-\contentsline {subsection}{\numberline {1.2.2}Video Processing}{4}{subsection.1.2.2}%
-\contentsline {subsection}{\numberline {1.2.3}Input/Output Formats}{4}{subsection.1.2.3}%
+\contentsline {subsection}{\numberline {1.2.2}Input/Output Formats}{4}{subsection.1.2.2}%
 \contentsline {chapter}{\numberline {2}System Overview}{5}{chapter.2}%
 \contentsline {section}{\numberline {2.1}Introduction}{5}{section.2.1}%
 \contentsline {section}{\numberline {2.2}COPUS Protocol}{5}{section.2.2}%
@@ -32,34 +31,31 @@
 \contentsline {section}{\numberline {6.1}Sliding Window}{14}{section.6.1}%
 \contentsline {section}{\numberline {6.2}Temporal Aggregation}{14}{section.6.2}%
 \contentsline {chapter}{\numberline {7}Getting Started with the Codebase}{15}{chapter.7}%
-\contentsline {section}{\numberline {7.1}Repository Structure}{15}{section.7.1}%
-\contentsline {section}{\numberline {7.2}Key Files and Their Purposes}{16}{section.7.2}%
-\contentsline {subsection}{\numberline {7.2.1}copus\_evaluation\_app.py}{16}{subsection.7.2.1}%
-\contentsline {subsection}{\numberline {7.2.2}full\_lecture\_evaluation.py}{16}{subsection.7.2.2}%
-\contentsline {subsection}{\numberline {7.2.3}copus\_gui.py}{17}{subsection.7.2.3}%
-\contentsline {subsection}{\numberline {7.2.4}video\_utils.py}{17}{subsection.7.2.4}%
-\contentsline {section}{\numberline {7.3}Development Workflow}{18}{section.7.3}%
-\contentsline {subsection}{\numberline {7.3.1}Setting Up Development Environment}{18}{subsection.7.3.1}%
-\contentsline {subsection}{\numberline {7.3.2}Testing Individual Components}{18}{subsection.7.3.2}%
-\contentsline {subsection}{\numberline {7.3.3}Code Style and Formatting}{18}{subsection.7.3.3}%
-\contentsline {section}{\numberline {7.4}Current System State and Limitations}{18}{section.7.4}%
-\contentsline {subsection}{\numberline {7.4.1}What Works Well}{18}{subsection.7.4.1}%
-\contentsline {subsection}{\numberline {7.4.2}Known Limitations}{18}{subsection.7.4.2}%
-\contentsline {section}{\numberline {7.5}Debugging and Troubleshooting}{19}{section.7.5}%
-\contentsline {subsection}{\numberline {7.5.1}Common Development Issues}{19}{subsection.7.5.1}%
-\contentsline {subsection}{\numberline {7.5.2}Useful Debugging Commands}{19}{subsection.7.5.2}%
-\contentsline {chapter}{\numberline {8}Future Works}{20}{chapter.8}%
-\contentsline {section}{\numberline {8.1}Improvements}{20}{section.8.1}%
-\contentsline {subsection}{\numberline {8.1.1}Active Learning for Low-Frequency Behaviors}{20}{subsection.8.1.1}%
-\contentsline {subsection}{\numberline {8.1.2}Visual Saliency Maps}{20}{subsection.8.1.2}%
-\contentsline {subsection}{\numberline {8.1.3}Hierarchical Behavior Modeling}{20}{subsection.8.1.3}%
-\contentsline {section}{\numberline {8.2}Research Ideas}{21}{section.8.2}%
-\contentsline {subsection}{\numberline {8.2.1}Multi-Classroom Comparison}{21}{subsection.8.2.1}%
-\contentsline {chapter}{\numberline {9}Deployment}{22}{chapter.9}%
-\contentsline {section}{\numberline {9.1}Installation}{22}{section.9.1}%
-\contentsline {section}{\numberline {9.2}Usage Examples}{22}{section.9.2}%
-\contentsline {chapter}{\numberline {10}Troubleshooting}{23}{chapter.10}%
-\contentsline {section}{\numberline {10.1}Common Issues}{23}{section.10.1}%
-\contentsline {section}{\numberline {10.2}FAQ}{23}{section.10.2}%
-\contentsline {chapter}{\numberline {A}COPUS Code Reference}{25}{appendix.A}%
-\contentsline {chapter}{\numberline {B}Model Architecture}{26}{appendix.B}%
+\contentsline {section}{\numberline {7.1}Key Files and Their Purposes}{15}{section.7.1}%
+\contentsline {subsection}{\numberline {7.1.1}copus\_evaluation\_app.py}{15}{subsection.7.1.1}%
+\contentsline {subsection}{\numberline {7.1.2}full\_lecture\_evaluation.py}{15}{subsection.7.1.2}%
+\contentsline {subsection}{\numberline {7.1.3}copus\_gui.py}{16}{subsection.7.1.3}%
+\contentsline {section}{\numberline {7.2}Development Workflow}{16}{section.7.2}%
+\contentsline {subsection}{\numberline {7.2.1}Setting Up Development Environment}{16}{subsection.7.2.1}%
+\contentsline {subsection}{\numberline {7.2.2}Code Style and Formatting}{17}{subsection.7.2.2}%
+\contentsline {section}{\numberline {7.3}Current System State and Limitations}{17}{section.7.3}%
+\contentsline {subsection}{\numberline {7.3.1}What Works Well}{17}{subsection.7.3.1}%
+\contentsline {subsection}{\numberline {7.3.2}Known Limitations}{17}{subsection.7.3.2}%
+\contentsline {section}{\numberline {7.4}Debugging and Troubleshooting}{17}{section.7.4}%
+\contentsline {subsection}{\numberline {7.4.1}Common Development Issues}{17}{subsection.7.4.1}%
+\contentsline {subsection}{\numberline {7.4.2}Useful Debugging Commands}{18}{subsection.7.4.2}%
+\contentsline {chapter}{\numberline {8}Future Works}{19}{chapter.8}%
+\contentsline {section}{\numberline {8.1}Improvements}{19}{section.8.1}%
+\contentsline {subsection}{\numberline {8.1.1}Active Learning for Low-Frequency Behaviors}{19}{subsection.8.1.1}%
+\contentsline {subsection}{\numberline {8.1.2}Visual Saliency Maps}{19}{subsection.8.1.2}%
+\contentsline {subsection}{\numberline {8.1.3}Hierarchical Behavior Modeling}{19}{subsection.8.1.3}%
+\contentsline {section}{\numberline {8.2}Research Ideas}{20}{section.8.2}%
+\contentsline {subsection}{\numberline {8.2.1}Multi-Classroom Comparison}{20}{subsection.8.2.1}%
+\contentsline {chapter}{\numberline {9}Deployment}{21}{chapter.9}%
+\contentsline {section}{\numberline {9.1}Installation}{21}{section.9.1}%
+\contentsline {section}{\numberline {9.2}Usage Examples}{21}{section.9.2}%
+\contentsline {chapter}{\numberline {10}Troubleshooting}{22}{chapter.10}%
+\contentsline {section}{\numberline {10.1}Common Issues}{22}{section.10.1}%
+\contentsline {section}{\numberline {10.2}FAQ}{22}{section.10.2}%
+\contentsline {chapter}{\numberline {A}COPUS Code Reference}{24}{appendix.A}%
+\contentsline {chapter}{\numberline {B}Model Architecture}{25}{appendix.B}%

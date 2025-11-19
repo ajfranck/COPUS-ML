@@ -36,7 +36,7 @@
 \maketitle
 
 \begin{abstract}
-Technical documentation for the COPUS (Classroom Observation Protocol for Undergraduate STEM) Video Evaluation System. Automates classroom video analysis using vision-language models to identify teaching and learning behaviors in 2-minute intervals.
+Technical documentation for the COPUS (Classroom Observation Protocol for Undergraduate STEM) Video Evaluation System. Automates classroom video analysis using vision-language models to identify teaching and learning behaviors in 2-minute intervals. We assume strong Python fundamentals, some machine learning background, and experience developing with PyTorch, Huggingface, and other similar deep learning libraries.
 \end{abstract}
 
 \tableofcontents
@@ -52,7 +52,6 @@ COPUS (Classroom Observation Protocol for Undergraduate STEM) is an tool to char
     \item Trained human observers watching classroom videos
     \item Manual coding of behaviors every 2 minutes
     \item Tracking 24 distinct behavioral codes (13 student, 11 instructor)
-    \item Time-intensive process: 1-2 hours per lecture video
     \item Reliability concerns with multiple observers having variability
 \end{itemize}
 
@@ -64,7 +63,6 @@ COPUS (Classroom Observation Protocol for Undergraduate STEM) is an tool to char
 
 \textbf{Fine-grained Activity Recognition:} Distinguishing between similar activities requires understanding subtle cues (e.g., "Clicker Group" vs. "Worksheet Group").
 
-\textbf{Variable Video Quality:} Classroom videos vary in resolution, lighting, camera angle, and audio quality. (Not the case in this implementation, all videos are relatively similar)
 
 \subsection{Sliding Window Approach}
 To handle full-length lectures (50-90 minutes), we employ a sliding window strategy:
@@ -107,13 +105,6 @@ Where $c_{action,w}$ is the confidence score for an action in window $w$. This s
     \item Transformers (Hugging Face): Model APIs, tokenizers
 \end{itemize}
 
-\subsection{Video Processing}
-\textbf{FFmpeg:}
-\begin{itemize}
-    \item Transcoding (MTS → MP4)
-    \item Frame extraction at specific framerates
-\end{itemize}
-
 \subsection{Input/Output Formats}
 \textbf{Video Formats:}
 \begin{itemize}
@@ -132,15 +123,6 @@ Where $c_{action,w}$ is the confidence score for an action in window $w$. This s
 \chapter{System Overview}
 
 \section{Introduction}
-
-\textbf{Key Features:}
-\begin{itemize}
-    \item Automated full-lecture processing
-    \item COPUS-compliant 2-minute interval coding
-    \item Multiple interfaces: CLI, GUI, Python API
-    \item Excel, JSON, and text report outputs
-    \item GPU acceleration with CPU fallback
-\end{itemize}
 
 \section{COPUS Protocol}
 
@@ -625,39 +607,6 @@ C_{action,interval} = \max_{w \in W_{overlapping}} C_{action,w}
 
 \chapter{Getting Started with the Codebase}
 
-\section{Repository Structure}
-
-\begin{verbatim}
-copus-video-evaluation/
-|-- app/
-|   |-- copus_evaluation_app.py    # Main CLI application
-|   |-- copus_gui.py                # Tkinter GUI
-|   |-- full_lecture_evaluation.py  # Core evaluation engine
-|   |-- video_utils.py              # Video preprocessing utilities
-|   |-- requirements.txt            # Python dependencies
-|   `-- README.md                   # Setup instructions
-|-- models/
-|   |-- copus_model_best/          # Fine-tuned model checkpoint (if available)
-|   `-- download_model.sh          # Script to download base model
-|-- notebooks/
-|   |-- exploratory_analysis.ipynb # Data exploration
-|   |-- model_evaluation.ipynb     # Performance metrics
-|   `-- visualization.ipynb        # Result visualization
-|-- tests/
-|   |-- test_evaluation.py         # Unit tests for evaluator
-|   |-- test_aggregation.py        # Tests for temporal aggregation
-|   `-- sample_videos/             # Short test videos
-|-- docs/
-|   |-- technical-doc.tex          # This document
-|   |-- user_guide.pdf             # End-user documentation
-|   `-- model_training.md          # Fine-tuning procedures
-`-- scripts/
-    |-- batch_process.py           # Process multiple videos
-    |-- validate_results.py        # Compare to human coding
-    `-- export_statistics.py       # Aggregate analytics
-\end{verbatim}
-
-
 \section{Key Files and Their Purposes}
 
 \subsection{copus\_evaluation\_app.py}
@@ -721,25 +670,6 @@ copus-video-evaluation/
     \item Adding visualization features
 \end{itemize}
 
-\subsection{video\_utils.py}
-\textbf{Purpose:} Video preprocessing utilities
-
-\textbf{Key Functions:}
-\begin{itemize}
-    \item \texttt{convert\_mts\_to\_mp4()}: Format conversion using FFmpeg
-    \item \texttt{extract\_frames\_at\_fps()}: Frame extraction at target framerate
-    \item \texttt{get\_video\_metadata()}: Duration, resolution, codec info
-    \item \texttt{validate\_video\_file()}: Check file existence and format
-\end{itemize}
-
-\textbf{When to modify:}
-\begin{itemize}
-    \item Supporting new video formats
-    \item Optimizing frame extraction
-    \item Adding video quality checks
-    \item Implementing video downsampling
-\end{itemize}
-
 \section{Development Workflow}
 
 \subsection{Setting Up Development Environment}
@@ -757,19 +687,6 @@ pip install -r requirements.txt
 python -c "import torch; print(f'CUDA: {torch.cuda.is_available()}')"
 python -c "import decord; print('Decord OK')"
 ffmpeg -version
-\end{lstlisting}
-
-\subsection{Testing Individual Components}
-
-\begin{lstlisting}
-# Test video preprocessing
-python video_utils.py --test-video tests/sample_videos/short_lecture.mp4
-
-# Test model inference on single window
-python full_lecture_evaluation.py --test-inference \
-    --video tests/sample_videos/short_lecture.mp4 \
-    --start-time 0 --end-time 10
-
 \end{lstlisting}
 
 \subsection{Code Style and Formatting}

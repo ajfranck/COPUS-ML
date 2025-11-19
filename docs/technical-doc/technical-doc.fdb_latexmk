@@ -1,6 +1,6 @@
 # Fdb version 4
-["pdflatex"] 1762473638 "/Users/1amaj/Desktop/Github/COPUS-ML/docs/technical-doc/technical-doc.tex" "technical-doc.pdf" "technical-doc" 1762473639 0
-  "/Users/1amaj/Desktop/Github/COPUS-ML/docs/technical-doc/technical-doc.tex" 1762473637 33203 fa85b977e7121d3702d7e94df6fbcfb7 ""
+["pdflatex"] 1763518022 "/Users/1amaj/Desktop/Github/COPUS-ML/docs/technical-doc/technical-doc.tex" "technical-doc.pdf" "technical-doc" 1763518022 0
+  "/Users/1amaj/Desktop/Github/COPUS-ML/docs/technical-doc/technical-doc.tex" 1763518021 30285 0e38183b993adf62c7eae6586e326c72 ""
   "/usr/local/texlive/2023/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc" 1136849721 2900 1537cc8184ad1792082cd229ecc269f4 ""
   "/usr/local/texlive/2023/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/local/texlive/2023/texmf-dist/fonts/tfm/jknappen/ec/tcrm1095.tfm" 1136768653 1536 02c06700a42be0f5a28664c7273f82e7 ""
@@ -95,10 +95,10 @@
   "/usr/local/texlive/2023/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1693413990 4623355 b8cad38412faebe1ce5b780a45db67bd ""
   "/usr/local/texlive/2023/texmf-var/web2c/pdftex/pdflatex.fmt" 1693413948 7883451 66fe613fdb0f04c78c5bb75deefed975 ""
   "/usr/local/texlive/2023/texmf.cnf" 1678822455 577 1b2b1af17af2508fb20dd85783af4050 ""
-  "technical-doc.aux" 1762473639 10939 c5c47b985142fe56a87b585b0d9c9457 "pdflatex"
-  "technical-doc.out" 1762473639 10449 4a7a81054f4b87df3a5cef945ef6ef85 "pdflatex"
-  "technical-doc.tex" 1762473637 33203 fa85b977e7121d3702d7e94df6fbcfb7 ""
-  "technical-doc.toc" 1762473639 5528 ba88e37a5f46c6ee3fd8b8b46265bc30 "pdflatex"
+  "technical-doc.aux" 1763518022 10422 6880ed017fffd5a45344f6ef0427c7d4 "pdflatex"
+  "technical-doc.out" 1763518022 9798 dfde877a73a65dfbd5488f248c2840d6 "pdflatex"
+  "technical-doc.tex" 1763518021 30285 0e38183b993adf62c7eae6586e326c72 ""
+  "technical-doc.toc" 1763518022 5175 816ebb00f2567cb85b7714e458427572 "pdflatex"
   (generated)
   "technical-doc.aux"
   "technical-doc.log"
