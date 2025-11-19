@@ -1,0 +1,342 @@
+\documentclass[11pt,a4paper]{article}
+
+% -------------------------
+% Packages
+% -------------------------
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{geometry}
+\geometry{margin=1in}
+\usepackage{microtype}
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue,
+  urlcolor=blue,
+  pdftitle={Manual: Classroom Lecture Video Analysis Model},
+  pdfauthor={Andy Franck, Brendan Ng, Ben Fitzgerald, Zane Derrod},
+}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{amsmath,amssymb}
+\usepackage{fancyhdr}
+\usepackage{longtable}
+\usepackage{tcolorbox}
+\usepackage{datetime}
+\usepackage{tocloft}
+
+% For code highlighting:
+% Option A: minted (recommended, needs -shell-escape)
+% \usepackage{minted}
+% Option B: listings (no shell-escape)
+\usepackage{listings}
+\lstset{
+  basicstyle=\ttfamily\small,
+  breaklines=true,
+  frame=single,
+  numberstyle=\tiny,
+  numbers=left,
+  captionpos=b
+}
+
+% -------------------------
+% Header / Footer
+% -------------------------
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{Classroom Lecture Video Analysis Model User Manual}
+\lhead{\leftmark}
+\rfoot{\thepage}
+
+% -------------------------
+% Metadata (edit these)
+% -------------------------
+\newcommand{\appname}{Classroom Lecture Video Analysis Model}
+\newcommand{\version}{v0.1}
+\newcommand{\authorname}{Andy Franck, Brendan Ng, Ben Fitzgerald, Zane Derrod}
+\newcommand{\hfurl}{https://huggingface.co/your-repo}
+
+% -------------------------
+% Document
+% -------------------------
+\begin{document}
+
+% Title
+\begin{titlepage}
+  \centering
+  \vspace*{\fill}        % pushes content to vertical center
+  {\huge\bfseries \appname \par}
+  \vspace{0.5cm}
+  {\Large User Instruction Manual \par}
+  \vspace{1cm}
+  {\large \authorname \par}
+  \vspace{0.25cm}
+  {\large Version: \version \par}
+  \vfill                  % pushes rest to bottom
+  {\small
+    Hosted on Hugging Face: \url{\hfurl} \\[3pt]
+    Generated: \today
+  }
+\end{titlepage}
+
+
+\tableofcontents
+\newpage
+
+\section{Overview}
+
+The Classroom Lecture Video Analysis Model automatically evaluates classroom lecture videos using the COPUS framework, generating standardized behavioral codes and summary reports without manual grading. This manual provides end users with instructions for installation, usage, and interpretation of system outputs.
+
+\section{Introduction}
+
+The Classroom Lecture Video Analysis Model is designed to automatically evaluate college-level STEM lectures using the COPUS (Classroom Observation Protocol for Undergraduate STEM) framework. Traditionally, COPUS coding required trained observers to watch an entire lecture and manually record instructor and student behaviors in two-minute intervals. This manual process is both time-consuming and labor-intensive, often requiring one to two hours of analysis per lecture.
+
+The system automates this workflow with over 95\% accuracy, using a vision-language model to interpret video segments and identify COPUS-defined behaviors. After processing, it automatically generates an Excel spreadsheet containing the full COPUS matrix for the lecture, along with additional report files for further analysis. This enables instructors, researchers, and evaluators to conduct large-scale or repeated analyses efficiently and consistently.
+
+\subsection*{Scope}
+This user manual provides complete guidance for installing, configuring, and using the Classroom Lecture Video Analysis Model...
+
+
+% ================================================================
+\section{System Requirements}
+% ================================================================
+
+\subsection{Hardware Requirements}
+\begin{itemize}
+    \item Recommended: 32GB RAM, NVIDIA GPU with 16GB+ VRAM
+    \item Minimum: CPU-only mode supported but significantly slower
+\end{itemize}
+
+\subsection{Software Requirements}
+\begin{itemize}
+    \item Python 3.9 or later
+    \begin{itemize}
+        \item Download and setup tutorial:
+        \url{https://youtu.be/7GWWBywHhRo?t=9}
+    \end{itemize}
+    \item FFmpeg installed and added to PATH
+    \begin{itemize}
+        \item Download and setup tutorial:
+        \url{https://youtu.be/eRZRXpzZfM4} 
+    \end{itemize}
+    \item Windows, macOS, or Linux
+\end{itemize}
+
+% ================================================================
+\section{Installation}
+% ================================================================
+
+\subsection{Downloading the Software}
+\begin{enumerate}
+    \item Visit the repository:  
+    \url{https://github.com/ajfranck/COPUS-ML}
+    \item Click the big green \textbf{Code} button.
+    \item Select \textbf{Download ZIP}.
+    \item Go to the ZIP file download location.
+    \item Select the ZIP and make sure to EXTRACT to a convenient location.
+    %idk how specific this has to be... some people have issues finding the file, but will test further on others
+\end{enumerate}
+
+\subsection{Setting Up the Environment}
+\begin{enumerate}
+    \item Open PowerShell (Windows) or Terminal (macOS/Linux).
+    \item Navigate to the \texttt{app/} folder:
+\begin{verbatim}
+cd [paste path to extracted folder]/COPUS-ML-main/app
+\end{verbatim}
+
+        Or see Figure 1 above:
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.75\linewidth]{image.png}
+    \caption{Navigation Command Example}
+    \label{fig:placeholder}
+\end{figure}
+
+
+
+    \item Install dependencies with the following command:
+\begin{verbatim}
+pip install -r requirements.txt
+\end{verbatim}
+\end{enumerate}
+
+\subsection{Verify Installation}
+\begin{verbatim}
+python --version
+ffmpeg -version
+\end{verbatim}
+
+% ================================================================
+\section{Preparing Your Video}
+% ================================================================
+
+\subsection{Supported Formats}
+\begin{itemize}
+    \item MP4 (recommended)
+    \item MTS (auto-converted to MP4)
+\end{itemize}
+
+\subsection{Recommended Recording Conditions}
+\begin{itemize}
+    \item Clear view of instructor and students
+    \item Stable camera position
+    \item Minimal visual obstruction
+\end{itemize}
+
+
+% ================================================================
+\section{Running the Application}
+% ================================================================
+
+\subsection{Graphical User Interface (Recommended)}
+To launch the GUI type the following command (It will take a minute to appear):
+\begin{verbatim}
+python copus_gui.py
+\end{verbatim}
+
+The interface includes:
+\begin{itemize}
+    \item Video file picker
+    \item Output directory selector
+    \item Device selection (GPU Recommended for faster processing)
+    \item Evaluation start button
+\end{itemize}
+
+Processing time varies based on video length and hardware speed.
+
+\subsection{Command Line Interface (CLI)}
+
+\subsubsection*{Basic Evaluation}
+\begin{verbatim}
+python copus_evaluation_app.py lecture.mp4
+\end{verbatim}
+
+\subsubsection*{Specify Output Directory}
+\begin{verbatim}
+python copus_evaluation_app.py lecture.mp4 -o results/
+\end{verbatim}
+
+\subsubsection*{CPU Mode}
+\begin{verbatim}
+python copus_evaluation_app.py lecture.mp4 --device cpu
+\end{verbatim}
+
+% ================================================================
+\section{Output File Descriptions}
+% ================================================================
+
+The system generates three output files:
+
+\subsection{Excel COPUS Matrix}
+A human-readable summary including:
+\begin{itemize}
+    \item 2-minute intervals across columns
+    \item 24 COPUS behaviors across rows
+    \item Binary values indicating presence/absence
+    \item Totals, percentages, and summary metrics
+\end{itemize}
+
+\subsection{JSON Output}
+Contains:
+\begin{itemize}
+    \item Video metadata
+    \item Sliding-window predictions
+    \item Aggregated interval scores
+\end{itemize}
+
+\subsection{Text Summary Report}
+Includes:
+\begin{itemize}
+    \item Total behavior counts
+    \item Percentage of intervals with each behavior
+    \item Processing statistics
+\end{itemize}
+
+% -------------------------
+\section{Troubleshooting}
+\label{sec:troubleshooting}
+Common issues and fixes:
+\begin{itemize}
+  \item \textbf{Out of memory:} reduce batch size or fps, enable `--cpu`.
+  \item \textbf{Missing dependencies:} check `pip install -r requirements.txt`.
+  
+  \item \textbf{Model download blocked:} set `HF_TOKEN` for private repos.
+\end{itemize}
+
+
+
+% ================================================================
+\section{FAQ}
+% ================================================================
+
+\begin{description}
+  \item[Do I need a GPU?] No, but it speeds up processing dramatically.
+  \item[Can I use a non CUDA-enabled GPU?] No, our model only works with Nvidia's CUDA-enabled GPU. Please select the CPU option if this is the case.
+  \item[Can I change the 2-minute COPUS interval?] No — COPUS protocol requires 2-minute bins.
+  \item[Is internet required?] Only on the first run when downloading the base model.
+\end{description}
+
+
+
+% ================================================================
+\section{Appendix: COPUS Codes}
+% ================================================================
+
+\begin{tabular}{ll}
+\toprule
+Code & Description \\
+\midrule
+L & Listening \\ 
+Ind & Individual thinking \\
+CG & Clicker group work \\
+WG & Worksheet group work \\
+OG & Other group activity \\
+AnQ & Answering question \\
+SQ & Student question \\
+WC & Whole class discussion \\
+Prd & Prediction \\
+SP & Student presentation \\
+TQ & Test/quiz \\
+W & Waiting \\
+O & Other \\
+Lec & Lecturing \\
+RtW & Real-time writing \\
+FUp & Follow-up response \\
+PQ & Posing question \\
+CQ & Clicker question \\
+MG & Moving/guiding \\
+1o1 & One-on-one help \\
+D/V & Demo/video \\
+Adm & Administration \\
+W (Instructor) & Waiting \\
+O (Instructor) & Other \\
+\bottomrule
+\end{tabular}
+\\\\
+
+\subsection{COPUS Code Definitions}
+To avoid ambiguity in the COPUS parameters used in this project, we provide the following clarified definitions for FUp, RtW, Adm, and Lec.\\
+
+FUp — Instructor Follow-up
+An interval is coded as FUp when the instructor provides verbal feedback, clarification, or discussion related to a question, activity, or idea previously posed by either the instructor or the students.
+
+RtW — Instructor Real-time Writing
+An interval is coded as RtW when the instructor is actively and visibly writing or drawing in real time (using a marker, pen, stylus, chalk, or digital annotation tool) on a medium that is visible to students.
+
+Adm — Instructor Administration
+An interval is coded as Adm when the instructor is performing logistical or procedural classroom tasks, such as distributing or collecting materials, managing resources, or addressing administrative matters.
+
+Lec — Instructor Lecturing
+An interval is coded as Lec when the instructor is primarily engaged in continuous verbal delivery of course content. This includes explaining concepts, presenting new material, and providing extended descriptions without significant student interaction.
+\\\\
+\href{https://www.lifescied.org/doi/epdf/10.1187/cbe.13-08-0154}{COPUS Article and Code Definitions On Page 3}
+
+
+
+\end{document}
